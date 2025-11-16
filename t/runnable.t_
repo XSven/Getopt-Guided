@@ -1,0 +1,21 @@
+use strict;
+use warnings;
+
+use Test::More import => [ qw( BAIL_OUT is is_deeply like plan subtest use_ok ) ], tests => 12;
+use Test::Fatal qw( exception lives_ok );
+
+my $module;
+
+BEGIN {
+  $module = 'Getopt::Guided';
+  use_ok $module, 'getopts' or BAIL_OUT "Cannot loade module '$module'!"
+}
+
+sub run ( \@ ) {
+  local @ARGV = @{ $_[ 0 ] };
+
+  getopts '', my %opts
+}
+
+local @ARGV = qw( -a );
+run @ARGV;

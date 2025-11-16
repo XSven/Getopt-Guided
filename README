@@ -1,6 +1,6 @@
 NAME
 
-Getopt::Guided - ...
+Getopt::Guided - getopts implementation that follows POSIX utility guidelines
 
 INSTALLATION
 

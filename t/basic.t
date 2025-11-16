@@ -16,7 +16,7 @@ subtest 'Single option without option-argument (flag)' => sub {
 
   local @ARGV = qw( -b );
   my %got_opts;
-  lives_ok { getopts( 'b', %got_opts ) } 'Succeeded';
+  lives_ok { getopts 'b', %got_opts } 'Succeeded';
   is_deeply \%got_opts, { b => 1 }, 'Flag has value 1';
   is @ARGV, 0, '@ARGV is empty'
 };
@@ -26,7 +26,7 @@ subtest 'Single option with option-argument' => sub {
 
   local @ARGV = qw( -a foo );
   my %got_opts;
-  lives_ok { getopts( 'a:', %got_opts ) } 'Succeeded';
+  lives_ok { getopts 'a:', %got_opts } 'Succeeded';
   is_deeply \%got_opts, { a => 'foo' }, 'Option has option-argument';
   is @ARGV, 0, '@ARGV is empty'
 };
@@ -36,7 +36,7 @@ subtest 'Grouping: Flag followed by single option with option-argument' => sub {
 
   local @ARGV = qw( -ba foo );
   my %got_opts;
-  lives_ok { getopts( 'a:b', %got_opts ) } 'Succeeded';
+  lives_ok { getopts 'a:b', %got_opts } 'Succeeded';
   is_deeply \%got_opts, { a => 'foo', b => 1 }, 'Options properly set';
   is @ARGV, 0, '@ARGV is empty'
 };
@@ -46,7 +46,8 @@ subtest 'Disallowed grouping: Single option with option-argument in the middle' 
 
   local @ARGV = qw( -cab foo );
   my %got_opts;
-  like exception { getopts( 'a:bc', %got_opts ) }, qr/Option with option-argument isn't last one: a/, 'Check exception';
+  like exception { getopts 'a:bc', %got_opts }, qr/Option with option-argument isn't last one in a group: a/,
+    'Check exception';
   is_deeply \%got_opts, {}, '%got_opts is empty';
   is_deeply \@ARGV, [ qw( -cab foo ) ], '@ARGV restored'
 };
@@ -56,7 +57,7 @@ subtest 'End of options delimiter' => sub {
 
   local @ARGV = qw( -ba foo -c -- -d bar );
   my %got_opts;
-  lives_ok { getopts( 'a:bc', %got_opts ) } 'Succeeded';
+  lives_ok { getopts 'a:bc', %got_opts } 'Succeeded';
   is_deeply \%got_opts, { a => 'foo', b => 1, c => 1 }, 'Options properly set';
   is_deeply \@ARGV, [ qw( -d bar ) ], 'Options removed from @ARGV'
 };
@@ -66,7 +67,7 @@ subtest 'End of options delimiter is an option-argument' => sub {
 
   local @ARGV = qw( -ba foo -d -- -c );
   my %got_opts;
-  lives_ok { getopts( 'a:bcd:', %got_opts ) } 'Succeeded';
+  lives_ok { getopts 'a:bcd:', %got_opts } 'Succeeded';
   is_deeply \%got_opts, { a => 'foo', b => 1, c => 1, d => '--' }, 'Options properly set';
   is @ARGV, 0, '@ARGV is empty'
 };
@@ -76,7 +77,7 @@ subtest 'Unknown option' => sub {
 
   local @ARGV = qw( -b -d bar );
   my %got_opts;
-  like exception { getopts( 'a:b', %got_opts ) }, qr/\AUnknown option: d/, 'Check exception';
+  like exception { getopts 'a:b', %got_opts }, qr/\AUnknown option: d/, 'Check exception';
   is_deeply \%got_opts, {}, '%got_opts is empty';
   is_deeply \@ARGV, [ qw( -b -d bar ) ], '@ARGV restored'
 };
@@ -88,7 +89,7 @@ subtest 'Missing option-argument' => sub {
   my %got_opts;
   # https://github.com/Perl/perl5/issues/23906
   # Getopt::Std questionable undefined value bahaviour
-  like exception { getopts( 'a:bc:', %got_opts ) }, qr/Option has no option-argument: c/, 'Check exception';
+  like exception { getopts 'a:bc:', %got_opts }, qr/Option has no option-argument: c/, 'Check exception';
   is_deeply \%got_opts, {}, '%got_opts is empty';
   is_deeply \@ARGV, [ qw( -b -a foo -c ) ], '@ARGV restored'
 };
@@ -98,7 +99,7 @@ subtest 'Non-option-argument stops option parsing' => sub {
 
   local @ARGV = qw( -b -a foo bar -c );
   my %got_opts;
-  lives_ok { getopts( 'a:bc', %got_opts ) } 'Succeeded';
+  lives_ok { getopts 'a:bc', %got_opts } 'Succeeded';
   is_deeply \%got_opts, { a => 'foo', b => 1 }, 'Options properly set';
   is_deeply \@ARGV, [ qw( bar -c ) ], 'Options removed from @ARGV'
 };
@@ -108,7 +109,7 @@ subtest 'Overwrite option-argument' => sub {
 
   local @ARGV = qw( -a foo -b -a bar -c );
   my %got_opts;
-  lives_ok { getopts( 'a:bc', %got_opts ) } 'Succeeded';
+  lives_ok { getopts 'a:bc', %got_opts } 'Succeeded';
   is_deeply \%got_opts, { a => 'bar', b => 1, c => 1 }, 'Options properly set';
   is @ARGV, 0, '@ARGV is empty'
 };
@@ -118,17 +119,7 @@ subtest 'Slurp option' => sub {
 
   local @ARGV = qw( -a -b -c );
   my %got_opts;
-  lives_ok { getopts( 'a:bc', %got_opts ) } 'Succeeded';
+  lives_ok { getopts 'a:bc', %got_opts } 'Succeeded';
   is_deeply \%got_opts, { a => '-b', c => 1 }, 'Options properly set';
   is @ARGV, 0, '@ARGV is empty'
 }
-
-__END__
-sub run ( \@ ) {
-  local @ARGV = @{ $_[ 0 ] };
-
-  getopts '', my %opts
-}
-
-local @ARGV = qw( -a );
-run @ARGV;

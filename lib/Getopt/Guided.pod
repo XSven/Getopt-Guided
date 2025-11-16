@@ -2,27 +2,43 @@
 
 =head1 NAME
 
-Getopt::Guided - ...
+Getopt::Guided - getopts implementation that follows POSIX utility guidelines
 
 =head1 SYNOPSIS
 
+  use Getopt::Guided qw( getopts );
+
+  getopts 'a:bc', my %opts;
+
 =head1 DESCRIPTION
 
-This module exports the C<getopts()> subroutine on request. The subroutine
-has two mandatory parameters: An option specification that is a string and a hash.
-It processes @ARGV and shrinks it accordingly and stores the processing results in the hash.
+This module reimplements the C<getopts()> function of the L<Getopts::Std>
+core module.  The new implementation supports only the two-parameter
+form of C<getopts()>.  The first parameter is a string that contains the
+option characters.  The second parameter is a hash reference that stores
+the processing result. Each hash key refers to a provided option character
+and the corresponding hash value refers to the option-argument (or C<1>
+if it is a flag). This module exports the C<getopts()> function on request.
 
-C<getopts()> croaks if a processing error was detected; otherwise the subroutine returns nothing.
-
-It supports the POSIX utility syntax guidelines 3 to 10, inclusive, L<Section 12.2, Utility Syntax Guidelines|https://pubs.opengroup.org/onlinepubs/009604399/basedefs/xbd_chap12.html#tag_12_02>
-
-=head1 SEE ALSO
+The new implementation follows the L<POSIX utility syntax
+guidelines|https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02>
+4 to 10, inclusive. C<getopts()> croaks if a processing error occurs;
+otherwise the function returns nothing (void context). The processing errors
+are:
 
 =over 2
 
-=item *
+=item * An option is unknown
 
-L<Getopt::Std>
+=item * An option that requires an option-argument has none
+
+=item * An option with option-argument isn't last one in a group (cluster)
+
+=head1 CAVEAT
+
+Even if you are currently using the two-parameter form of the C<getopts()>
+function of C<Getopts::Std>, the new implementation isn't a drop in
+replacement.
 
 =back
 
