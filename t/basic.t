@@ -56,8 +56,7 @@ subtest 'Disallowed grouping: Single option with option-argument in the middle' 
 
   local @ARGV = qw( -cab foo );
   my %got_opts;
-  like exception { getopts 'a:bc', %got_opts }, qr/Option with option-argument isn't last one in a group: a/,
-    'Check exception';
+  like exception { getopts 'a:bc', %got_opts }, qr/option with argument isn't last one in group -- a/, 'Check exception';
   is_deeply \%got_opts, {}, '%got_opts is empty';
   is_deeply \@ARGV, [ qw( -cab foo ) ], '@ARGV restored'
 };
@@ -87,7 +86,7 @@ subtest 'Unknown option' => sub {
 
   local @ARGV = qw( -b -d bar );
   my %got_opts;
-  like exception { getopts 'a:b', %got_opts }, qr/\AUnknown option: d/, 'Check exception';
+  like exception { getopts 'a:b', %got_opts }, qr/illegal option -- d/, 'Check exception';
   is_deeply \%got_opts, {}, '%got_opts is empty';
   is_deeply \@ARGV, [ qw( -b -d bar ) ], '@ARGV restored'
 };
@@ -97,7 +96,7 @@ subtest 'Unknown option; default properly restored' => sub {
 
   local @ARGV = qw( -b -d bar );
   my %got_opts = ( a => 'foo' );
-  like exception { getopts 'a:b', %got_opts }, qr/\AUnknown option: d/, 'Check exception';
+  like exception { getopts 'a:b', %got_opts }, qr/illegal option -- d/, 'Check exception';
   is_deeply \%got_opts, { a => 'foo' }, '%got_opts properly restored';
   is_deeply \@ARGV, [ qw( -b -d bar ) ], '@ARGV restored'
 };
@@ -109,7 +108,7 @@ subtest 'Missing option-argument' => sub {
   my %got_opts;
   # https://github.com/Perl/perl5/issues/23906
   # Getopt::Std questionable undefined value bahaviour
-  like exception { getopts 'a:bc:', %got_opts }, qr/Option has no option-argument: c/, 'Check exception';
+  like exception { getopts 'a:bc:', %got_opts }, qr/option requires an argument -- c/, 'Check exception';
   is_deeply \%got_opts, {}, '%got_opts is empty';
   is_deeply \@ARGV, [ qw( -b -a foo -c ) ], '@ARGV restored'
 };

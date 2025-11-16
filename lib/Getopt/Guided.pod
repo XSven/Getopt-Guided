@@ -24,17 +24,16 @@ if it is a flag). This module exports the C<getopts()> function on request.
 
 The new implementation follows the L<POSIX utility syntax
 guidelines|https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02>
-4 to 10, inclusive. C<getopts()> croaks if a processing error occurs;
-otherwise the function returns nothing (void context). The processing errors
-are:
+4 to 10, inclusive. C<getopts()> dies if a processing error occurs; otherwise
+the function returns nothing (void context). The processing errors are:
 
 =over 2
 
-=item * An option is unknown
+=item * illegal option
 
-=item * An option that requires an option-argument has none
+=item * option requires an argument
 
-=item * An option with option-argument isn't last one in a group (cluster)
+=item * option with argument isn't last one in group
 
 =head1 CAVEAT
 

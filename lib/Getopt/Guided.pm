@@ -7,7 +7,8 @@ package Getopt::Guided;
 
 $Getopt::Guided::VERSION = 'v1.0.0';
 
-use Exporter qw( import );
+use Exporter       qw( import );
+use File::Basename qw( basename );
 
 @Getopt::Guided::EXPORT_OK = qw( getopts );
 
@@ -30,12 +31,12 @@ sub getopts ( $\% ) {
         shift @ARGV;
         if ( $rest eq '' ) {
           # Guideline 7
-          $error = "Option has no option-argument: $first", last unless @ARGV;
+          $error = "option requires an argument -- $first", last unless @ARGV;
           # Guideline 6, Guideline 8
           $opts->{ $first } = shift @ARGV
         } else {
           # Guideline 5
-          $error = "Option with option-argument isn't last one in a group: $first";
+          $error = "option with argument isn't last one in group -- $first";
           last;
         }
       } else {
@@ -48,7 +49,7 @@ sub getopts ( $\% ) {
         }
       }
     } else {
-      $error = "Unknown option: $first";
+      $error = "illegal option -- $first";
       last
     }
   }
@@ -57,8 +58,7 @@ sub getopts ( $\% ) {
     # Restore to avoid side effects
     @ARGV = @argv_backup; ## no critic ( RequireLocalizedPunctuationVars )
     %$opts = %opts_backup;
-    require Carp;
-    Carp::croak( "$error, stopped" )
+    die sprintf( "%s: %s\n", basename( $0 ), $error ); ## no critic ( RequireCarping )
   }
 
   undef

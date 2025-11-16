@@ -10,13 +10,13 @@ on configure => sub {
 };
 
 on runtime => sub {
-  requires 'Carp'     => '1.32';                         # Don't vivify @CARP_NOT and @ISA in caller's namespace
-  requires 'Exporter' => '0';
-  requires 'strict'   => '0';
-  requires 'warnings' => '0'
+  requires 'Exporter'       => '0';
+  requires 'File::Basename' => '0';
+  requires 'strict'         => '0';
+  requires 'warnings'       => '0'
 };
 
 on test => sub {
   requires 'Test::Fatal' => '0';
-  requires 'Test::More' => '1.001005'                    # Subtests accept args
+  requires 'Test::More' => '1.001005'    # Subtests accept args
 }
