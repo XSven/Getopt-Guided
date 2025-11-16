@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is is_deeply like plan subtest use_ok ) ], tests => 12;
+use Test::More import => [ qw( BAIL_OUT is is_deeply like plan subtest use_ok ) ], tests => 14;
 use Test::Fatal qw( exception lives_ok );
 
 my $module;
@@ -28,6 +28,16 @@ subtest 'Single option with option-argument' => sub {
   my %got_opts;
   lives_ok { getopts 'a:', %got_opts } 'Succeeded';
   is_deeply \%got_opts, { a => 'foo' }, 'Option has option-argument';
+  is @ARGV, 0, '@ARGV is empty'
+};
+
+subtest 'Default for option with option-argument' => sub {
+  plan tests => 3;
+
+  local @ARGV = qw( -b );
+  my %got_opts = ( a => 'foo' );
+  lives_ok { getopts 'a:b', %got_opts } 'Succeeded';
+  is_deeply \%got_opts, { a => 'foo', b => 1 }, 'Options properly set';
   is @ARGV, 0, '@ARGV is empty'
 };
 
@@ -79,6 +89,16 @@ subtest 'Unknown option' => sub {
   my %got_opts;
   like exception { getopts 'a:b', %got_opts }, qr/\AUnknown option: d/, 'Check exception';
   is_deeply \%got_opts, {}, '%got_opts is empty';
+  is_deeply \@ARGV, [ qw( -b -d bar ) ], '@ARGV restored'
+};
+
+subtest 'Unknown option; default properly restored' => sub {
+  plan tests => 3;
+
+  local @ARGV = qw( -b -d bar );
+  my %got_opts = ( a => 'foo' );
+  like exception { getopts 'a:b', %got_opts }, qr/\AUnknown option: d/, 'Check exception';
+  is_deeply \%got_opts, { a => 'foo' }, '%got_opts properly restored';
   is_deeply \@ARGV, [ qw( -b -d bar ) ], '@ARGV restored'
 };
 

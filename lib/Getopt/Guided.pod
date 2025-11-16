@@ -8,7 +8,9 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
 
   use Getopt::Guided qw( getopts );
 
-  getopts 'a:bc', my %opts;
+  local @ARGV = qw( -c -a foo );
+  my %opts = ( d => 'bar' );
+  getopts 'a:bcd:', %opts;
 
 =head1 DESCRIPTION
 
