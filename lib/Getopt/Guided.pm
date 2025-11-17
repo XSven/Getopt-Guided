@@ -18,7 +18,7 @@ sub getopts ( $\% ) {
 
   my @argv_backup = @ARGV;
   my %opts_backup = %$opts;
-  my $error;
+  my @error;
 
   my @opts = split( //, $spec );
   # Guideline 4, Guideline 9
@@ -31,12 +31,12 @@ sub getopts ( $\% ) {
         shift @ARGV;
         if ( $rest eq '' ) {
           # Guideline 7
-          $error = "option requires an argument -- $first", last unless @ARGV;
+          @error = ( 'option requires an argument', $first ), last unless @ARGV;
           # Guideline 6, Guideline 8
           $opts->{ $first } = shift @ARGV
         } else {
           # Guideline 5
-          $error = "option with argument isn't last one in group -- $first";
+          @error = ( "option with argument isn't last one in group", $first );
           last;
         }
       } else {
@@ -49,16 +49,18 @@ sub getopts ( $\% ) {
         }
       }
     } else {
-      $error = "illegal option -- $first";
+      @error = ( 'illegal option', $first );
       last
     }
   }
 
-  if ( $error ) {
+  if ( @error ) {
     # Restore to avoid side effects
     @ARGV = @argv_backup; ## no critic ( RequireLocalizedPunctuationVars )
     %$opts = %opts_backup;
-    die sprintf( "%s: %s\n", basename( $0 ), $error ); ## no critic ( RequireCarping )
+    # Prepare and throw error message:
+    # Program name, type of error, and invalid option character
+    die sprintf( "%s: %s -- %s\n", basename( $0 ), @error ); ## no critic ( RequireCarping )
   }
 
   undef

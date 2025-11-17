@@ -23,9 +23,9 @@ and the corresponding hash value refers to the option-argument (or C<1>
 if it is a flag). This module exports the C<getopts()> function on request.
 
 The new implementation follows the L<POSIX utility syntax
-guidelines|https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02>
+guidelines|https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html#tag_12_02>
 4 to 10, inclusive. C<getopts()> dies if a processing error occurs; otherwise
-the function returns nothing (void context). The processing errors are:
+the function returns nothing (void context). The processing error types are:
 
 =over 2
 
@@ -35,11 +35,21 @@ the function returns nothing (void context). The processing errors are:
 
 =item * option with argument isn't last one in group
 
+=back
+
 =head1 CAVEAT
 
 Even if you are currently using the two-parameter form of the C<getopts()>
 function of C<Getopts::Std>, the new implementation isn't a drop in
 replacement.
+
+=head1 SEE ALSO
+
+=over 2
+
+=item *
+
+L<getopts|https://pubs.opengroup.org/onlinepubs/9799919799//utilities/getopts.html>
 
 =back
 
