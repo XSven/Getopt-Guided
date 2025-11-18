@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is is_deeply like plan subtest use_ok ) ], tests => 14;
+use Test::More import => [ qw( BAIL_OUT is is_deeply like plan subtest use_ok ) ], tests => 15;
 use Test::Fatal qw( exception lives_ok );
 
 my $module;
@@ -10,6 +10,13 @@ BEGIN {
   $module = 'Getopt::Guided';
   use_ok $module, 'getopts' or BAIL_OUT "Cannot loade module '$module'!"
 }
+
+subtest 'Validate parameters' => sub {
+  plan tests => 1;
+
+  my %opts;
+  like exception { getopts '-', %opts }, qr/non-alphanumeric/, 'Validate spec parameter'
+};
 
 subtest 'Single option without option-argument (flag)' => sub {
   plan tests => 3;
