@@ -16,7 +16,7 @@ use File::Basename qw( basename );
 sub getopts ( $\% ) {
   my ( $spec, $opts ) = @_;
 
-  die "Option spec parameter (1st paramter) contains non-alphanumeric character\n"
+  die "getopts: \$spec parameter isn't a string of alphanumeric characters, stopped" ## no critic ( RequireCarping )
     unless $spec =~ m/\A (?: [[:alnum:]] :?)+ \z/x;
 
   my @argv_backup = @ARGV;

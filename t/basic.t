@@ -11,11 +11,14 @@ BEGIN {
   use_ok $module, 'getopts' or BAIL_OUT "Cannot loade module '$module'!"
 }
 
-subtest 'Validate parameters' => sub {
-  plan tests => 1;
+subtest 'Validate $spec parameter' => sub {
+  plan tests => 4;
 
   my %opts;
-  like exception { getopts '-', %opts }, qr/non-alphanumeric/, 'Validate spec parameter'
+  like exception { getopts '',     %opts }, qr/alphanumeric/, 'Empty value is not allowed';
+  like exception { getopts 'a:-b', %opts }, qr/alphanumeric/, "'-' character is not allowed";
+  like exception { getopts ':a:b', %opts }, qr/alphanumeric/, "Leading ':' character is not allowed";
+  lives_ok { getopts 'a:b', %opts } 'Succeeded'
 };
 
 subtest 'Single option without option-argument (flag)' => sub {
