@@ -4,7 +4,7 @@ use warnings;
 on configure => sub {
   requires 'ExtUtils::MakeMaker'           => '6.76';    # Offers the RECURSIVE_TEST_FILES, NO_PERLLOCAL features
   requires 'ExtUtils::MakeMaker::CPANfile' => '0';       # Needs at least ExtUtils::MakeMaker 6.52
-  requires 'File::Spec'                    => '0';
+  requires 'File::Spec::Functions'         => '0';
   requires 'strict'                        => '0';
   requires 'warnings'                      => '0'
 };

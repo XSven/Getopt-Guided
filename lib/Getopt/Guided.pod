@@ -65,16 +65,3 @@ This is free software; you can redistribute it and/or modify it under the
 same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-# https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html
-#https://stackoverflow.com/questions/56131811/is-there-a-tacit-list-of-reserved-names-for-posix-short-options
-
-# - One or more options without option-arguments, followed by at most one option that takes an option-argument, should be accepted when grouped behind one '-' delimiter.
-# https://stackoverflow.com/questions/26542155/getopt-accepting-other-option-as-argument-in-c
-# - Each option and option-argument should be a separate argument
-
-# - The first -- argument that is not an option-argument should be accepted as a delimiter indicating the end of options. Any following arguments should be treated as operands, even if they begin with the '-' character.
-
-# - All options should precede operands on the command line.
-

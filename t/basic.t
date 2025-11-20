@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is is_deeply like plan subtest use_ok ) ], tests => 15;
+use Test::More import => [ qw( BAIL_OUT is is_deeply like plan subtest use_ok ) ], tests => 16;
 use Test::Fatal qw( exception lives_ok );
 
 my $module;
@@ -19,6 +19,20 @@ subtest 'Validate $spec parameter' => sub {
   like exception { getopts 'a:-b', %opts }, qr/alphanumeric/, "'-' character is not allowed";
   like exception { getopts ':a:b', %opts }, qr/alphanumeric/, "Leading ':' character is not allowed";
   lives_ok { getopts 'a:b', %opts } 'Succeeded'
+};
+
+subtest 'Validate $opts parameter' => sub {
+  plan tests => 5;
+
+  my %opts = ( b => 1 );
+  like exception { getopts 'a:b', %opts }, qr/illegal default option/, 'Flags cannot be defaulted';
+  %opts = ( d => 'bar' );
+  like exception { getopts 'a:b', %opts }, qr/illegal default option/, 'Default options have to be specified';
+  local @ARGV = qw( -a bar );
+  %opts = ( a => 'foo' );
+  lives_ok { getopts 'a:b', %opts } 'Succeeded';
+  is_deeply \%opts, { a => 'bar' }, 'Default was overwritten';
+  is @ARGV, 0, '@ARGV is empty'
 };
 
 subtest 'Single option without option-argument (flag)' => sub {

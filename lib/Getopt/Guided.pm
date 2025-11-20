@@ -18,6 +18,11 @@ sub getopts ( $\% ) {
 
   die "getopts: \$spec parameter isn't a string of alphanumeric characters, stopped" ## no critic ( RequireCarping )
     unless $spec =~ m/\A (?: [[:alnum:]] :?)+ \z/x;
+  foreach ( keys %$opts ) {
+    # A default option has to have an option-argument
+    die 'getopts: $opts parameter hash contains illegal default option, stopped' ## no critic ( RequireCarping )
+      if index( $spec, "$_:" ) < 0;
+  }
 
   my @argv_backup = @ARGV;
   my %opts_backup = %$opts;
