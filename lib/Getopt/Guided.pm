@@ -39,9 +39,11 @@ sub getopts ( $\% ) {
         shift @ARGV;
         if ( $rest eq '' ) {
           # Guideline 7
-          @error = ( 'option requires an argument', $first ), last unless @ARGV;
+          @error = ( 'option requires an argument', $first ), last
+            unless @ARGV;
           # Guideline 6, Guideline 8
-          $opts->{ $first } = shift @ARGV
+          @error = ( 'option requires an argument', $first ), last
+            unless defined( $opts->{ $first } = shift @ARGV );
         } else {
           # Guideline 5
           @error = ( "option with argument isn't last one in group", $first );
@@ -57,8 +59,7 @@ sub getopts ( $\% ) {
         }
       }
     } else {
-      @error = ( 'illegal option', $first );
-      last
+      @error = ( 'illegal option', $first ), last
     }
   }
 

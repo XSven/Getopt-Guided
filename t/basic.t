@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is is_deeply like plan subtest use_ok ) ], tests => 16;
+use Test::More import => [ qw( BAIL_OUT is is_deeply like plan subtest use_ok ) ], tests => 17;
 use Test::Fatal qw( exception lives_ok );
 
 my $module;
@@ -135,6 +135,16 @@ subtest 'Missing option-argument' => sub {
   like exception { getopts 'a:bc:', %got_opts }, qr/option requires an argument -- c/, 'Check exception';
   is_deeply \%got_opts, {}, '%got_opts is empty';
   is_deeply \@ARGV, [ qw( -b -a foo -c ) ], '@ARGV restored'
+};
+
+subtest 'Undefined option-argument' => sub {
+  plan tests => 3;
+
+  local @ARGV = ( '-b', '-a', undef, '-c' );
+  my %got_opts;
+  like exception { getopts 'a:bc', %got_opts }, qr/option requires an argument -- a/, 'Check exception';
+  is_deeply \%got_opts, {}, '%got_opts is empty';
+  is_deeply \@ARGV, [ ( '-b', '-a', undef, '-c' ) ], '@ARGV restored'
 };
 
 subtest 'Non-option-argument stops option parsing' => sub {
