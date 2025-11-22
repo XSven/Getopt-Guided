@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is is_deeply like plan subtest use_ok ) ], tests => 18;
+use Test::More import => [ qw( BAIL_OUT is is_deeply like plan subtest use_ok ) ], tests => 19;
 use Test::Fatal qw( exception lives_ok );
 
 my $module;
@@ -174,6 +174,16 @@ subtest 'Overwrite option-argument' => sub {
   my %got_opts;
   lives_ok { getopts 'a:bc', %got_opts } 'Succeeded';
   is_deeply \%got_opts, { a => 'bar', b => 1, c => 1 }, 'Options properly set';
+  is @ARGV, 0, '@ARGV is empty'
+};
+
+subtest 'Increment flag value' => sub {
+  plan tests => 3;
+
+  local @ARGV = qw( -a foo -v -b -vv -c );
+  my %got_opts;
+  lives_ok { getopts 'a:bcv', %got_opts } 'Succeeded';
+  is_deeply \%got_opts, { a => 'foo', b => 1, c => 1, v => 3 }, 'Options properly set';
   is @ARGV, 0, '@ARGV is empty'
 };
 

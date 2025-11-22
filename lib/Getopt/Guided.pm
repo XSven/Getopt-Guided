@@ -50,7 +50,7 @@ sub getopts ( $\% ) {
           last;
         }
       } else {
-        $opts->{ $first } = 1;
+        ++$opts->{ $first };
         if ( $rest eq '' ) {
           shift @ARGV
         } else {

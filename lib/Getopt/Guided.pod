@@ -43,6 +43,14 @@ value is provided for an option that requires an option-argument.
 If any of the processing errors occurs, C<getopts()> restores C<@ARGV>
 and C<%opts> (its second parameter) before it dies.
 
+An option that requires no option-argument is called a flag. If a flag
+is provided, its hash value is C<1>, which in perl boolean context means
+true. If the same flag is provided multiple times, the implementation could
+keep the hash value. But for perl each positive integer is true in boolean
+context. Therefore each occurrence of the flag increments its hash value
+by one.  For example, this is useful for incrementing a verbosity level
+represented by the C<-v> flag.
+
 =head1 CAVEAT
 
 Even if you are currently using the two-parameter form of the C<getopts()>
@@ -56,6 +64,10 @@ replacement.
 =item *
 
 L<getopts|https://pubs.opengroup.org/onlinepubs/9799919799//utilities/getopts.html>
+
+=item *
+
+L<Tacit list of POSIX short options|https://stackoverflow.com/questions/56131811/is-there-a-tacit-list-of-reserved-names-for-posix-short-options>
 
 =back
 
