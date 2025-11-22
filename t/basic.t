@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is is_deeply like plan subtest use_ok ) ], tests => 17;
+use Test::More import => [ qw( BAIL_OUT is is_deeply like plan subtest use_ok ) ], tests => 18;
 use Test::Fatal qw( exception lives_ok );
 
 my $module;
@@ -155,6 +155,16 @@ subtest 'Non-option-argument stops option parsing' => sub {
   lives_ok { getopts 'a:bc', %got_opts } 'Succeeded';
   is_deeply \%got_opts, { a => 'foo', b => 1 }, 'Options properly set';
   is_deeply \@ARGV, [ qw( bar -c ) ], 'Options removed from @ARGV'
+};
+
+subtest 'The option delimiter is a non-option-argument that stops option parsing' => sub {
+  plan tests => 3;
+
+  local @ARGV = qw( -b - a foo bar -c );
+  my %got_opts;
+  lives_ok { getopts 'a:bc', %got_opts } 'Succeeded';
+  is_deeply \%got_opts, { b => 1 }, 'Options properly set';
+  is_deeply \@ARGV, [ qw( - a foo bar -c ) ], 'Options removed from @ARGV'
 };
 
 subtest 'Overwrite option-argument' => sub {
