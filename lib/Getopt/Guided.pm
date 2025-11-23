@@ -69,10 +69,10 @@ sub getopts ( $\% ) {
     %$opts = %opts_backup;
     # Prepare and throw error message:
     # Program name, type of error, and invalid option character
-    die sprintf( "%s: %s -- %s\n", basename( $0 ), @error ); ## no critic ( RequireCarping )
+    warn sprintf( "%s: %s -- %s\n", basename( $0 ), @error ); ## no critic ( RequireCarping )
   }
 
-  undef
+  @error == 0
 }
 
 1

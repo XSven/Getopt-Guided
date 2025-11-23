@@ -1,8 +1,9 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is is_deeply like plan subtest use_ok ) ], tests => 19;
+use Test::More import => [ qw( BAIL_OUT is is_deeply like ok plan subtest use_ok ) ], tests => 19;
 use Test::Fatal qw( exception lives_ok );
+use Test::Warn  qw( warning_like );
 
 my $module;
 
@@ -18,7 +19,7 @@ subtest 'Validate $spec parameter' => sub {
   like exception { getopts '',     %opts }, qr/alphanumeric/, 'Empty value is not allowed';
   like exception { getopts 'a:-b', %opts }, qr/alphanumeric/, "'-' character is not allowed";
   like exception { getopts ':a:b', %opts }, qr/alphanumeric/, "Leading ':' character is not allowed";
-  lives_ok { getopts 'a:b', %opts } 'Succeeded'
+  ok getopts( 'a:b', %opts ), 'Succeeded'
 };
 
 subtest 'Validate $opts parameter' => sub {
@@ -30,7 +31,7 @@ subtest 'Validate $opts parameter' => sub {
   like exception { getopts 'a:b', %opts }, qr/illegal default option/, 'Default options have to be specified';
   local @ARGV = qw( -a bar );
   %opts = ( a => 'foo' );
-  lives_ok { getopts 'a:b', %opts } 'Succeeded';
+  ok getopts( 'a:b', %opts ), 'Succeeded';
   is_deeply \%opts, { a => 'bar' }, 'Default was overwritten';
   is @ARGV, 0, '@ARGV is empty'
 };
@@ -39,8 +40,7 @@ subtest 'Single option without option-argument (flag)' => sub {
   plan tests => 3;
 
   local @ARGV = qw( -b );
-  my %got_opts;
-  lives_ok { getopts 'b', %got_opts } 'Succeeded';
+  ok getopts( 'b', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { b => 1 }, 'Flag has value 1';
   is @ARGV, 0, '@ARGV is empty'
 };
@@ -49,8 +49,7 @@ subtest 'Single option with option-argument' => sub {
   plan tests => 3;
 
   local @ARGV = qw( -a foo );
-  my %got_opts;
-  lives_ok { getopts 'a:', %got_opts } 'Succeeded';
+  ok getopts( 'a:', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => 'foo' }, 'Option has option-argument';
   is @ARGV, 0, '@ARGV is empty'
 };
@@ -60,7 +59,7 @@ subtest 'Default for option with option-argument' => sub {
 
   local @ARGV = qw( -b );
   my %got_opts = ( a => 'foo' );
-  lives_ok { getopts 'a:b', %got_opts } 'Succeeded';
+  ok getopts( 'a:b', %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => 'foo', b => 1 }, 'Options properly set';
   is @ARGV, 0, '@ARGV is empty'
 };
@@ -69,18 +68,18 @@ subtest 'Grouping: Flag followed by single option with option-argument' => sub {
   plan tests => 3;
 
   local @ARGV = qw( -ba foo );
-  my %got_opts;
-  lives_ok { getopts 'a:b', %got_opts } 'Succeeded';
+  ok getopts( 'a:b', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => 'foo', b => 1 }, 'Options properly set';
   is @ARGV, 0, '@ARGV is empty'
 };
 
 subtest 'Disallowed grouping: Single option with option-argument in the middle' => sub {
-  plan tests => 3;
+  plan tests => 4;
 
   local @ARGV = qw( -cab foo );
   my %got_opts;
-  like exception { getopts 'a:bc', %got_opts }, qr/option with argument isn't last one in group -- a/, 'Check exception';
+  warning_like { ok !getopts( 'a:bc', %got_opts ), 'Failed' } qr/option with argument isn't last one in group -- a/,
+    'Check warning';
   is_deeply \%got_opts, {}, '%got_opts is empty';
   is_deeply \@ARGV, [ qw( -cab foo ) ], '@ARGV restored'
 };
@@ -89,8 +88,7 @@ subtest 'End of options delimiter' => sub {
   plan tests => 3;
 
   local @ARGV = qw( -ba foo -c -- -d bar );
-  my %got_opts;
-  lives_ok { getopts 'a:bc', %got_opts } 'Succeeded';
+  ok getopts( 'a:bc', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => 'foo', b => 1, c => 1 }, 'Options properly set';
   is_deeply \@ARGV, [ qw( -d bar ) ], 'Options removed from @ARGV'
 };
@@ -99,50 +97,49 @@ subtest 'End of options delimiter is an option-argument' => sub {
   plan tests => 3;
 
   local @ARGV = qw( -ba foo -d -- -c );
-  my %got_opts;
-  lives_ok { getopts 'a:bcd:', %got_opts } 'Succeeded';
+  ok getopts( 'a:bcd:', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => 'foo', b => 1, c => 1, d => '--' }, 'Options properly set';
   is @ARGV, 0, '@ARGV is empty'
 };
 
 subtest 'Unknown option' => sub {
-  plan tests => 3;
+  plan tests => 4;
 
   local @ARGV = qw( -b -d bar );
   my %got_opts;
-  like exception { getopts 'a:b', %got_opts }, qr/illegal option -- d/, 'Check exception';
+  warning_like { ok !getopts( 'a:b', %got_opts ), 'Failed' } qr/illegal option -- d/, 'Check warning';
   is_deeply \%got_opts, {}, '%got_opts is empty';
   is_deeply \@ARGV, [ qw( -b -d bar ) ], '@ARGV restored'
 };
 
 subtest 'Unknown option; default properly restored' => sub {
-  plan tests => 3;
+  plan tests => 4;
 
   local @ARGV = qw( -b -d bar );
   my %got_opts = ( a => 'foo' );
-  like exception { getopts 'a:b', %got_opts }, qr/illegal option -- d/, 'Check exception';
+  warning_like { ok !getopts( 'a:b', %got_opts ), 'Failed' } qr/illegal option -- d/, 'Check warning';
   is_deeply \%got_opts, { a => 'foo' }, '%got_opts properly restored';
   is_deeply \@ARGV, [ qw( -b -d bar ) ], '@ARGV restored'
 };
 
 subtest 'Missing option-argument' => sub {
-  plan tests => 3;
+  plan tests => 4;
 
   local @ARGV = qw( -b -a foo -c );
   my %got_opts;
   # https://github.com/Perl/perl5/issues/23906
   # Getopt::Std questionable undefined value bahaviour
-  like exception { getopts 'a:bc:', %got_opts }, qr/option requires an argument -- c/, 'Check exception';
+  warning_like { ok !getopts( 'a:bc:', %got_opts ), 'Failed' } qr/option requires an argument -- c/, 'Check warning';
   is_deeply \%got_opts, {}, '%got_opts is empty';
   is_deeply \@ARGV, [ qw( -b -a foo -c ) ], '@ARGV restored'
 };
 
 subtest 'Undefined option-argument' => sub {
-  plan tests => 3;
+  plan tests => 4;
 
   local @ARGV = ( '-b', '-a', undef, '-c' );
   my %got_opts;
-  like exception { getopts 'a:bc', %got_opts }, qr/option requires an argument -- a/, 'Check exception';
+  warning_like { ok !getopts( 'a:bc', %got_opts ), 'Failed' } qr/option requires an argument -- a/, 'Check warning';
   is_deeply \%got_opts, {}, '%got_opts is empty';
   is_deeply \@ARGV, [ ( '-b', '-a', undef, '-c' ) ], '@ARGV restored'
 };
@@ -151,8 +148,7 @@ subtest 'Non-option-argument stops option parsing' => sub {
   plan tests => 3;
 
   local @ARGV = qw( -b -a foo bar -c );
-  my %got_opts;
-  lives_ok { getopts 'a:bc', %got_opts } 'Succeeded';
+  ok getopts( 'a:bc', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => 'foo', b => 1 }, 'Options properly set';
   is_deeply \@ARGV, [ qw( bar -c ) ], 'Options removed from @ARGV'
 };
@@ -161,8 +157,7 @@ subtest 'The option delimiter is a non-option-argument that stops option parsing
   plan tests => 3;
 
   local @ARGV = qw( -b - a foo bar -c );
-  my %got_opts;
-  lives_ok { getopts 'a:bc', %got_opts } 'Succeeded';
+  ok getopts( 'a:bc', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { b => 1 }, 'Options properly set';
   is_deeply \@ARGV, [ qw( - a foo bar -c ) ], 'Options removed from @ARGV'
 };
@@ -171,8 +166,7 @@ subtest 'Overwrite option-argument' => sub {
   plan tests => 3;
 
   local @ARGV = qw( -a foo -b -a bar -c );
-  my %got_opts;
-  lives_ok { getopts 'a:bc', %got_opts } 'Succeeded';
+  ok getopts( 'a:bc', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => 'bar', b => 1, c => 1 }, 'Options properly set';
   is @ARGV, 0, '@ARGV is empty'
 };
@@ -181,8 +175,7 @@ subtest 'Increment flag value' => sub {
   plan tests => 3;
 
   local @ARGV = qw( -a foo -v -b -vv -c );
-  my %got_opts;
-  lives_ok { getopts 'a:bcv', %got_opts } 'Succeeded';
+  ok getopts( 'a:bcv', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => 'foo', b => 1, c => 1, v => 3 }, 'Options properly set';
   is @ARGV, 0, '@ARGV is empty'
 };
@@ -191,8 +184,7 @@ subtest 'Slurp option' => sub {
   plan tests => 3;
 
   local @ARGV = qw( -a -b -c );
-  my %got_opts;
-  lives_ok { getopts 'a:bc', %got_opts } 'Succeeded';
+  ok getopts( 'a:bc', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => '-b', c => 1 }, 'Options properly set';
   is @ARGV, 0, '@ARGV is empty'
 }

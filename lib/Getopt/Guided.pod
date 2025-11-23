@@ -8,9 +8,9 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
 
   use Getopt::Guided qw( getopts );
 
-  local @ARGV = qw( -c -a foo );
+  local @ARGV = qw( -c -v -a foo -vv );
   my %opts = ( d => 'bar' );
-  getopts 'a:bcd:', %opts;
+  getopts 'a:bcd:v', %opts;
 
 =head1 DESCRIPTION
 
@@ -24,8 +24,8 @@ if it is a flag). This module exports the C<getopts()> function on request.
 
 The new implementation follows the L<POSIX utility syntax
 guidelines|https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html#tag_12_02>
-4 to 10, inclusive. C<getopts()> dies if a processing error occurs; otherwise
-the function returns nothing (void context). The processing error types are:
+4 to 10, inclusive. C<getopts()> warns and returns false if a processing error
+occurs; otherwise the function returns true. The processing error types are:
 
 =over 2
 
@@ -41,7 +41,7 @@ The second processing error occurs if either no argument or the C<undef>
 value is provided for an option that requires an option-argument.
 
 If any of the processing errors occurs, C<getopts()> restores C<@ARGV>
-and C<%opts> (its second parameter) before it dies.
+and C<%opts> (its second parameter) before it warns and returns false.
 
 An option that requires no option-argument is called a flag. If a flag
 is provided, its hash value is C<1>, which in perl boolean context means
