@@ -29,14 +29,14 @@ sub getopts ( $\% ) {
   my %opts_backup = %$opts;
   my @error;
 
-  my @opts = split( //, $spec );
+  my @chars = split( //, $spec );
   # Guideline 4, Guideline 9
   while ( @ARGV and my ( $first, $rest ) = ( $ARGV[ 0 ] =~ m/\A-(.)(.*)/ ) ) {
     # Guideline 10
     shift @ARGV, last if $ARGV[ 0 ] eq '--';
     my $pos = index( $spec, $first );
     if ( $pos >= 0 ) {
-      if ( defined( $opts[ $pos + 1 ] ) and ( $opts[ $pos + 1 ] eq ':' ) ) {
+      if ( defined( $chars[ $pos + 1 ] ) and ( $chars[ $pos + 1 ] eq ':' ) ) {
         shift @ARGV;
         if ( $rest eq '' ) {
           # Guideline 7
