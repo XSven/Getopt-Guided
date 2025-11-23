@@ -7,6 +7,7 @@ package Getopt::Guided;
 
 $Getopt::Guided::VERSION = 'v1.0.0';
 
+use Carp           qw( croak );
 use Exporter       qw( import );
 use File::Basename qw( basename );
 
@@ -16,11 +17,11 @@ use File::Basename qw( basename );
 sub getopts ( $\% ) {
   my ( $spec, $opts ) = @_;
 
-  die "getopts: \$spec parameter isn't a string of alphanumeric characters, stopped" ## no critic ( RequireCarping )
+  croak "getopts: \$spec parameter isn't a string of alphanumeric characters, stopped"
     unless $spec =~ m/\A (?: [[:alnum:]] :?)+ \z/x;
   foreach ( keys %$opts ) {
     # A default option has to have an option-argument
-    die 'getopts: $opts parameter hash contains illegal default option, stopped' ## no critic ( RequireCarping )
+    croak 'getopts: $opts parameter hash contains illegal default option, stopped'
       if index( $spec, "$_:" ) < 0;
   }
 
