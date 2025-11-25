@@ -36,7 +36,10 @@ sub getopts ( $\% ) {
     shift @ARGV, last if $ARGV[ 0 ] eq '--';
     my $pos = index( $spec, $first );
     if ( $pos >= 0 ) {
-      if ( defined( $chars[ $pos + 1 ] ) and ( $chars[ $pos + 1 ] eq ':' ) ) {
+      # The option-argument indicator ":" is the character that follows an
+      # option character if the option requires an option-argument
+      my $indicator = $chars[ $pos + 1 ];
+      if ( defined $indicator and $indicator eq ':' ) {
         shift @ARGV;
         if ( $rest eq '' ) {
           # Guideline 7
@@ -44,7 +47,7 @@ sub getopts ( $\% ) {
             unless @ARGV;
           # Guideline 6, Guideline 8
           @error = ( 'option requires an argument', $first ), last
-            unless defined( $opts->{ $first } = shift @ARGV );
+            unless defined( $opts->{ $first } = shift @ARGV );    # Option-argument overwrite situation!
         } else {
           # Guideline 5
           @error = ( "option with argument isn't last one in group", $first );
@@ -68,7 +71,7 @@ sub getopts ( $\% ) {
     # Restore to avoid side effects
     @ARGV = @argv_backup; ## no critic ( RequireLocalizedPunctuationVars )
     %$opts = %opts_backup;
-    # Prepare and throw error message:
+    # Prepare and print warning message:
     # Program name, type of error, and invalid option character
     warn sprintf( "%s: %s -- %s\n", basename( $0 ), @error ); ## no critic ( RequireCarping )
   }
