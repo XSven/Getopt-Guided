@@ -43,7 +43,14 @@ sub getopts ( $\% ) {
           # Guideline 6, Guideline 8
           @error = ( 'option requires an argument', $first ), last
             unless defined( my $argv = shift @ARGV );
-          $opts->{ $first } = $argv    # Option-argument overwrite situation!
+          if ( $ind eq ':' ) {
+            # Option-argument overwrite situation!
+            $opts->{ $first } = $argv
+          } else {
+            # Create and fill list of option-arguments
+            $opts->{ $first } = [] unless exists $opts->{ $first };
+            push @{ $opts->{ $first } }, $argv
+          }
         } else {
           # Guideline 5
           @error = ( "option with argument isn't last one in group", $first );

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is is_deeply like ok plan subtest use_ok ) ], tests => 19;
+use Test::More import => [ qw( BAIL_OUT is is_deeply like ok plan subtest use_ok ) ], tests => 20;
 use Test::Fatal qw( exception lives_ok );
 use Test::Warn  qw( warning_like );
 
@@ -182,5 +182,26 @@ subtest 'Slurp option' => sub {
   local @ARGV = qw( -a -b -c );
   ok getopts( 'a:bc', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => '-b', c => 1 }, 'Options properly set';
+  is @ARGV, 0, '@ARGV is empty'
+};
+
+subtest 'List of option-arguments; comma (",") option-argument indicator' => sub {
+  plan tests => 9;
+
+  local @ARGV = qw( -a foo -b );
+  ok getopts( 'a:I,b', my %got_opts ), 'Succeeded';
+  is_deeply \%got_opts, { a => 'foo', b => 1 }, 'Options properly set';
+  is @ARGV, 0, '@ARGV is empty';
+
+  local @ARGV = qw( -I lib -a foo -c );
+  %got_opts = ();
+  ok getopts( 'a:I,c', %got_opts ), 'Succeeded';
+  is_deeply \%got_opts, { I => [ 'lib' ], a => 'foo', c => 1 }, 'Options properly set';
+  is @ARGV, 0, '@ARGV is empty';
+
+  local @ARGV = qw( -b -I lib -a foo -I local/lib/perl5 );
+  %got_opts = ();
+  ok getopts( 'I,a:b', %got_opts ), 'Succeeded';
+  is_deeply \%got_opts, { I => [ 'lib', 'local/lib/perl5' ], a => 'foo', b => 1 }, 'Options properly set';
   is @ARGV, 0, '@ARGV is empty'
 }
