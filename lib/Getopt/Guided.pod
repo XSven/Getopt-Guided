@@ -51,6 +51,10 @@ context. Therefore each occurrence of the flag increments its hash value
 by one.  For example, this is useful for incrementing a verbosity level
 represented by the C<-v> flag.
 
+If an option that requires an option-argument is repeated, the arguments
+overwrite each other and the last argument wins that means it is assigned
+as a value to option character key in C<%opts>.
+
 =head1 CAVEAT
 
 Even if you are currently using the two-parameter form of the C<getopts()>
