@@ -38,8 +38,8 @@ sub getopts ( $\% ) {
     if ( $pos >= 0 ) {
       # The option-argument indicator ":" is the character that follows an
       # option character if the option requires an option-argument
-      my $indicator = $chars[ $pos + 1 ];
-      if ( defined $indicator and $indicator eq ':' ) {
+      my $ind = $chars[ $pos + 1 ];
+      if ( defined $ind and $ind eq ':' ) {
         shift @ARGV;
         if ( $rest eq '' ) {
           # Guideline 7
@@ -47,7 +47,8 @@ sub getopts ( $\% ) {
             unless @ARGV;
           # Guideline 6, Guideline 8
           @error = ( 'option requires an argument', $first ), last
-            unless defined( $opts->{ $first } = shift @ARGV );    # Option-argument overwrite situation!
+            unless defined( my $argv = shift @ARGV );
+          $opts->{ $first } = $argv    # Option-argument overwrite situation!
         } else {
           # Guideline 5
           @error = ( "option with argument isn't last one in group", $first );
