@@ -16,24 +16,17 @@ subtest 'Validate $spec parameter' => sub {
   plan tests => 4;
 
   my %opts;
-  like exception { getopts '',     %opts }, qr/alphanumeric/, 'Empty value is not allowed';
-  like exception { getopts 'a:-b', %opts }, qr/alphanumeric/, "'-' character is not allowed";
-  like exception { getopts ':a:b', %opts }, qr/alphanumeric/, "Leading ':' character is not allowed";
+  like exception { getopts '',     %opts }, qr/isn't a string of alphanumeric/, 'Empty value is not allowed';
+  like exception { getopts 'a:-b', %opts }, qr/isn't a string of alphanumeric/, "'-' character is not allowed";
+  like exception { getopts ':a:b', %opts }, qr/isn't a string of alphanumeric/, "Leading ':' character is not allowed";
   ok getopts( 'a:b', %opts ), 'Succeeded'
 };
 
 subtest 'Validate $opts parameter' => sub {
-  plan tests => 5;
+  plan tests => 1;
 
-  my %opts = ( b => 1 );
-  like exception { getopts 'a:b', %opts }, qr/illegal default option/, 'Flags cannot be defaulted';
-  %opts = ( d => 'bar' );
-  like exception { getopts 'a:b', %opts }, qr/illegal default option/, 'Default options have to be specified';
-  local @ARGV = qw( -a bar );
-  %opts = ( a => 'foo' );
-  ok getopts( 'a:b', %opts ), 'Succeeded';
-  is_deeply \%opts, { a => 'bar' }, 'Default was overwritten';
-  is @ARGV, 0, '@ARGV is empty'
+  my %opts = ( a => 'foo' );
+  like exception { getopts 'a:b', %opts }, qr/isn't empty/, 'Result %opts hash has to be empty'
 };
 
 subtest 'Single option without option-argument (flag)' => sub {
@@ -58,8 +51,9 @@ subtest 'Default for option with option-argument' => sub {
   plan tests => 3;
 
   local @ARGV = qw( -b );
-  my %got_opts = ( a => 'foo' );
-  ok getopts( 'a:b', %got_opts ), 'Succeeded';
+  # Simulate default for option with option-argument
+  unshift @ARGV, ( -a => 'foo' );
+  ok getopts( 'a:b', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => 'foo', b => 1 }, 'Options properly set';
   is @ARGV, 0, '@ARGV is empty'
 };
@@ -116,10 +110,12 @@ subtest 'Unknown option; default properly restored' => sub {
   plan tests => 4;
 
   local @ARGV = qw( -b -d bar );
-  my %got_opts = ( a => 'foo' );
+  # Simulate default for option with option-argument
+  unshift @ARGV, ( -a => 'foo' );
+  my %got_opts;
   warning_like { ok !getopts( 'a:b', %got_opts ), 'Failed' } qr/illegal option -- d/, 'Check warning';
-  is_deeply \%got_opts, { a => 'foo' }, '%got_opts properly restored';
-  is_deeply \@ARGV, [ qw( -b -d bar ) ], '@ARGV restored'
+  is_deeply \%got_opts, {}, '%got_opts is empty';
+  is_deeply \@ARGV, [ qw( -a foo -b -d bar ) ], '@ARGV restored'
 };
 
 subtest 'Missing option-argument' => sub {

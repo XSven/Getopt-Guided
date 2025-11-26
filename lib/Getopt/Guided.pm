@@ -19,16 +19,11 @@ sub getopts ( $\% ) {
 
   croak "getopts: \$spec parameter isn't a string of alphanumeric characters, stopped"
     unless $spec =~ m/\A (?: [[:alnum:]] :?)+ \z/x;
-  foreach ( keys %$opts ) {
-    # A default option has to have an option-argument
-    croak 'getopts: $opts parameter hash contains illegal default option, stopped'
-      if index( $spec, "$_:" ) < 0;
-  }
+  croak "getopts: \$opts parameter hash isn't empty, stopped"
+    if %$opts;
 
   my @argv_backup = @ARGV;
-  my %opts_backup = %$opts;
   my @error;
-
   my @chars = split( //, $spec );
   # Guideline 4, Guideline 9
   while ( @ARGV and my ( $first, $rest ) = ( $ARGV[ 0 ] =~ m/\A-(.)(.*)/ ) ) {
@@ -71,7 +66,7 @@ sub getopts ( $\% ) {
   if ( @error ) {
     # Restore to avoid side effects
     @ARGV = @argv_backup; ## no critic ( RequireLocalizedPunctuationVars )
-    %$opts = %opts_backup;
+    %$opts = ();
     # Prepare and print warning message:
     # Program name, type of error, and invalid option character
     warn sprintf( "%s: %s -- %s\n", basename( $0 ), @error ); ## no critic ( RequireCarping )
