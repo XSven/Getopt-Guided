@@ -186,22 +186,42 @@ subtest 'Slurp option' => sub {
 };
 
 subtest 'List of option-arguments; comma (",") option-argument indicator' => sub {
-  plan tests => 9;
+  plan tests => 4;
 
-  local @ARGV = qw( -a foo -b );
-  ok getopts( 'a:I,b', my %got_opts ), 'Succeeded';
-  is_deeply \%got_opts, { a => 'foo', b => 1 }, 'Options properly set';
-  is @ARGV, 0, '@ARGV is empty';
+  subtest 'List option specified but not used' => sub {
+    plan tests => 3;
 
-  local @ARGV = qw( -I lib -a foo -c );
-  %got_opts = ();
-  ok getopts( 'a:I,c', %got_opts ), 'Succeeded';
-  is_deeply \%got_opts, { I => [ 'lib' ], a => 'foo', c => 1 }, 'Options properly set';
-  is @ARGV, 0, '@ARGV is empty';
+    local @ARGV = qw( -a foo -b );
+    ok getopts( 'a:I,b', my %got_opts ), 'Succeeded';
+    is_deeply \%got_opts, { a => 'foo', b => 1 }, 'Options properly set';
+    is @ARGV, 0, '@ARGV is empty'
+  };
 
-  local @ARGV = qw( -b -I lib -a foo -I local/lib/perl5 );
-  %got_opts = ();
-  ok getopts( 'I,a:b', %got_opts ), 'Succeeded';
-  is_deeply \%got_opts, { I => [ 'lib', 'local/lib/perl5' ], a => 'foo', b => 1 }, 'Options properly set';
-  is @ARGV, 0, '@ARGV is empty'
+  subtest 'List option repeated once' => sub {
+    plan tests => 3;
+
+    local @ARGV = qw( -I lib -a foo -c );
+    ok getopts( 'a:I,c', my %got_opts ), 'Succeeded';
+    is_deeply \%got_opts, { I => [ 'lib' ], a => 'foo', c => 1 }, 'Options properly set';
+    is @ARGV, 0, '@ARGV is empty'
+  };
+
+  subtest 'List option repeated 2 times' => sub {
+    plan tests => 3;
+
+    local @ARGV = qw( -b -I lib -a foo -I local/lib/perl5 );
+    ok getopts( 'I,a:b', my %got_opts ), 'Succeeded';
+    is_deeply \%got_opts, { I => [ 'lib', 'local/lib/perl5' ], a => 'foo', b => 1 }, 'Options properly set';
+    is @ARGV, 0, '@ARGV is empty'
+  };
+
+  subtest 'List option repeated 3 times; 3rd option-argument is undefined' => sub {
+    plan tests => 4;
+
+    local @ARGV = ( '-I', 'lib', '-a', 'foo', '-c', '-I' );
+    my %got_opts;
+    warning_like { ok !getopts( 'a:cI,', %got_opts ), 'Failed' } qr/option requires an argument -- I/, 'Check warning';
+    is_deeply \%got_opts, {}, '%got_opts is empty';
+    is_deeply \@ARGV, [ ( '-I', 'lib', '-a', 'foo', '-c', '-I' ) ], '@ARGV restored'
+  }
 }
