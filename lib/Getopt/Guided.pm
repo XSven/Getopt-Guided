@@ -11,6 +11,9 @@ use Carp           qw( croak );
 use Exporter       qw( import );
 use File::Basename qw( basename );
 
+# Option-Argument Indicator Character Class
+sub OAICC () { '[,:]' }
+
 @Getopt::Guided::EXPORT_OK = qw( getopts );
 
 # https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02>
@@ -18,7 +21,7 @@ sub getopts ( $\% ) {
   my ( $spec, $opts ) = @_;
 
   croak "getopts: \$spec parameter isn't a string of alphanumeric characters, stopped"
-    unless $spec =~ m/\A (?: [[:alnum:]] [,:] ?)+ \z/x;
+    unless $spec =~ m/\A (?: [[:alnum:]] ${ \( OAICC ) } ?)+ \z/x;
   croak "getopts: \$opts parameter hash isn't empty, stopped"
     if %$opts;
 
@@ -34,7 +37,7 @@ sub getopts ( $\% ) {
       # The option-argument indicator "," or ":" is the character that follows
       # an option character if the option requires an option-argument
       my $ind = $chars[ $pos + 1 ];
-      if ( defined $ind and $ind =~ m/\A [,:] \z/x ) {
+      if ( defined $ind and $ind =~ m/\A ${ \( OAICC ) } \z/x ) {
         shift @ARGV;
         if ( $rest eq '' ) {
           # Guideline 7
