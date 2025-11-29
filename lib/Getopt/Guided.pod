@@ -8,8 +8,11 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
 
   use Getopt::Guided qw( getopts );
 
-  local @ARGV = qw( -I lib -c -v -a foo -I local/lib/perl5  -vv );
-  getopts 'I,a:bcd:v', my %opts;
+  local @ARGV = qw( -d dv1 -c -v -a av1 -d dv2 -a av2 -d -- -vv v1 v2 );
+  getopts 'a:bcd,v', my %opts;
+
+  # %opts == ( a => 'av2', c => 1, d => [ 'dv1', 'dv2', '--' ], v => 3 )
+  # @ARGV == ( 'v1', 'v2' )
 
 =head1 DESCRIPTION
 

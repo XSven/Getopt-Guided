@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is is_deeply like ok plan subtest use_ok ) ], tests => 20;
+use Test::More import => [ qw( BAIL_OUT is is_deeply like ok plan subtest use_ok ) ], tests => 21;
 use Test::Fatal qw( exception lives_ok );
 use Test::Warn  qw( warning_like );
 
@@ -224,4 +224,13 @@ subtest 'List of option-arguments; comma (",") option-argument indicator' => sub
     is_deeply \%got_opts, {}, '%got_opts is empty';
     is_deeply \@ARGV, [ ( '-I', 'lib', '-a', 'foo', '-c', '-I' ) ], '@ARGV restored'
   }
+};
+
+subtest 'POD synopsis' => sub {
+  plan tests => 2;
+
+  local @ARGV = qw( -d dv1 -c -v -a av1 -d dv2 -a av2 -d -- -vv v1 v2 );
+  getopts 'a:bcd,v', my %got_opts;
+  is_deeply \%got_opts, { a => 'av2', c => 1, d => [ 'dv1', 'dv2', '--' ], v => 3 }, 'Options properly set';
+  is_deeply \@ARGV, [ qw( v1 v2 ) ], 'Options removed from @ARGV'
 }
