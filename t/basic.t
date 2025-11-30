@@ -13,12 +13,13 @@ BEGIN {
 }
 
 subtest 'Validate $spec parameter' => sub {
-  plan tests => 4;
+  plan tests => 5;
 
   my %opts;
   like exception { getopts '',     %opts }, qr/isn't a string of alphanumeric/, 'Empty value is not allowed';
   like exception { getopts 'a:-b', %opts }, qr/isn't a string of alphanumeric/, "'-' character is not allowed";
   like exception { getopts ':a:b', %opts }, qr/isn't a string of alphanumeric/, "Leading ':' character is not allowed";
+  like exception { getopts 'aba:', %opts }, qr/duplicate option characters/,    'Same option character is not allowed';
   ok getopts( 'a:b', %opts ), 'Succeeded'
 };
 

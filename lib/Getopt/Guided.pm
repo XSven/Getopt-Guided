@@ -22,12 +22,21 @@ sub getopts ( $\% ) {
 
   croak "getopts: \$spec parameter isn't a string of alphanumeric characters, stopped"
     unless $spec =~ m/\A (?: [[:alnum:]] ${ \( OAICC ) } ?)+ \z/x;
+  my @chars = split( //, $spec );
+  {
+    my %dups;
+    for ( @chars ) {
+      next if m/\A ${ \( OAICC ) } \z/x;
+      croak 'getopts: $spec parameter contains duplicate option characters, stopped'
+        if exists $dups{ $_ };
+      ++$dups{ $_ }
+    }
+  }
   croak "getopts: \$opts parameter hash isn't empty, stopped"
     if %$opts;
 
   my @argv_backup = @ARGV;
   my @error;
-  my @chars = split( //, $spec );
   # Guideline 4, Guideline 9
   while ( @ARGV and my ( $first, $rest ) = ( $ARGV[ 0 ] =~ m/\A-(.)(.*)/ ) ) {
     # Guideline 10
