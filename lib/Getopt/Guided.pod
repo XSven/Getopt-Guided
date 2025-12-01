@@ -80,7 +80,7 @@ replacement.
 
 =item *
 
-L<getopts|https://pubs.opengroup.org/onlinepubs/9799919799//utilities/getopts.html>
+L<getopts|https://pubs.opengroup.org/onlinepubs/9799919799/utilities/getopts.html>
 
 =item *
 

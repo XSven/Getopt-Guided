@@ -6,7 +6,7 @@ use Getopt::Guided qw( getopts );
 sub run ( \@ ) {
   local @ARGV = @{ $_[ 0 ] };
 
-  return 1 unless getopts '-a:b', my %opts;
+  return 2 unless getopts '-a:b', my %opts;
   0
 }
 
