@@ -2,6 +2,7 @@ Release history for Getopt-Guided
 
 1.0.1    Tue Dec  2 04:01:40 PM CET 2025
          - Fix test script and documentation
+         - Improve utility integration test script
 
 1.0.0    Mon Dec  1 07:25:09 AM CET 2025
          - Initial release

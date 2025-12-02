@@ -1,0 +1,13 @@
+use strict;
+use warnings;
+
+use Getopt::Guided qw( getopts );
+
+sub run ( \@ ) {
+  local @ARGV = @{ $_[ 0 ] };
+
+  return 2 unless getopts 'Vh', my %opts;
+  0
+}
+
+exit run @ARGV
