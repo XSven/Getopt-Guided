@@ -9,4 +9,4 @@ use File::Spec::Functions qw( catfile );
 my $utility = catfile( qw( t examples broken ) );
 script_compiles $utility;
 script_fails $utility, { exit => 255 }, 'Has fatal error';
-script_stderr_like qr/getopts: .* alphanumeric .* at $utility .*/, 'Check error details'
+script_stderr_like qr/getopts: .* alphanumeric .* at \Q$utility\E .*/, 'Check error details'
