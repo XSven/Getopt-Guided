@@ -5,7 +5,7 @@ use warnings;
 
 package Getopt::Guided;
 
-$Getopt::Guided::VERSION = 'v1.0.1';
+$Getopt::Guided::VERSION = 'v1.1.0';
 
 use Carp           qw( croak );
 use Exporter       qw( import );
