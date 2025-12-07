@@ -5,16 +5,28 @@ use warnings;
 
 package Getopt::Guided;
 
-$Getopt::Guided::VERSION = 'v1.1.0';
+$Getopt::Guided::VERSION = 'v1.1.1';
 
 use Carp           qw( croak );
-use Exporter       qw( import );
 use File::Basename qw( basename );
 
 # Option-Argument Indicator Character Class
 sub OAICC () { '[,:]' }
 
 @Getopt::Guided::EXPORT_OK = qw( getopts getopts3 );
+
+sub import {
+  my $module = shift;
+
+  our @EXPORT_OK;
+  my $target = caller;
+  for my $func ( @_ ) {
+    croak "$module: '$func' is not exported, stopped"
+      unless grep { $func eq $_ } @EXPORT_OK;
+    no strict 'refs'; ## no critic ( ProhibitNoStrict )
+    *{ "$target\::$func" } = $module->can( $func )
+  }
+}
 
 # https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02>
 sub getopts3 ( \@$\% ) {

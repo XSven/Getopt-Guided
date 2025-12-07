@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is is_deeply like ok plan subtest use_ok ) ], tests => 22;
+use Test::More import => [ qw( BAIL_OUT is is_deeply like ok plan subtest use_ok ) ], tests => 23;
 use Test::Fatal qw( exception lives_ok );
 use Test::Warn  qw( warning_like );
 
@@ -11,6 +11,8 @@ BEGIN {
   $module = 'Getopt::Guided';
   use_ok $module, qw( getopts getopts3 ) or BAIL_OUT "Cannot loade module '$module'!"
 }
+
+like exception { $module->import( 'processopts' ) }, qr/not exported/, 'Export error';
 
 subtest 'Validate $spec parameter' => sub {
   plan tests => 5;
