@@ -24,12 +24,17 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
 
 This module reimplements the C<getopts()> function of the L<Getopts::Std>
 core module.  The new implementation supports only the two-parameter form
-of C<getopts()>.  The first parameter is a string that contains the option
-characters (the options specification).  The second parameter is an empty
-hash (passed by reference) that stores the processing result. Each hash
-key refers to a provided option character and the corresponding hash value
-refers to the option-argument (or C<1> if it is a flag). This module exports
-the C<getopts()> function on request.
+of C<getopts()>.
+
+The first parameter (the options specification) is a string that contains
+the option characters. An option character has to be an alphanumeric character.
+
+The second parameter is an empty hash (passed by reference) that stores the
+processing result. Each hash key refers to a provided option character and
+the corresponding hash value refers to the option-argument (or C<1> if it
+is a flag).
+
+This module exports the C<getopts()> function on request.
 
 The new implementation follows the L<POSIX utility syntax
 guidelines|https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html#tag_12_02>
@@ -59,9 +64,9 @@ If any of the processing errors occurs, C<getopts()> restores C<@ARGV>
 before it warns and returns false.
 
 As of version 1.1.0 this module provides the additional function C<getopts3()>.
-This function has a 3rd leading parameter. The parameter is an array of
-argument values. It replaces the implicit use of C<@ARGV>. This module
-exports the C<getopts3()> function on request too.
+This function has a 3rd leading parameter. The parameter is an array
+(passed by reference) of argument values. It replaces the implicit use of
+C<@ARGV>. This module exports the C<getopts3()> function on request too.
 
 =head1 OPTION TYPES
 

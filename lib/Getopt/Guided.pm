@@ -32,8 +32,10 @@ sub import {
 sub getopts3 ( \@$\% ) {
   my ( $argv, $spec, $opts ) = @_;
 
+  # The croak message is slightly inaccurate because it does not mention the
+  # optional option-argument indicator character
   croak "getopts: \$spec parameter isn't a string of alphanumeric characters, stopped"
-    unless $spec =~ m/\A (?: [[:alnum:]] ${ \( OAICC ) } ?)+ \z/x;
+    unless $spec =~ m/\A (?: [[:alnum:]] ${ \( OAICC ) }? )+ \z/x;
   my @chars = split( //, $spec );
   {
     my %dups;

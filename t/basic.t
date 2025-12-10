@@ -12,7 +12,7 @@ BEGIN {
   use_ok $module, qw( getopts getopts3 ) or BAIL_OUT "Cannot loade module '$module'!"
 }
 
-like exception { $module->import( 'processopts' ) }, qr/not exported/, 'Export error';
+like exception { $module->import( '_private' ) }, qr/not exported/, 'Export error';
 
 subtest 'Validate $spec parameter' => sub {
   plan tests => 5;
