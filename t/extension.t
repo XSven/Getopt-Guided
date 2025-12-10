@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is is_deeply like ok plan subtest use_ok ) ], tests => 5;
+use Test::More import => [ qw( BAIL_OUT is is_deeply like ok plan subtest use_ok ) ], tests => 6;
 use Test::Warn qw( warning_like );
 
 my $module;
@@ -11,12 +11,22 @@ BEGIN {
   use_ok $module, qw( getopts getopts3 ) or BAIL_OUT "Cannot loade module '$module'!"
 }
 
-subtest 'Logically negate flag value (-b) and increment flag value (-v)' => sub {
+subtest 'Logically negate flag value; exclamation mark ("!") flag indicator' => sub {
   plan tests => 3;
 
   local @ARGV = qw( -b -a foo -v -b -vv -c );
-  ok getopts( 'a:b!cv+', my %got_opts ), 'Succeeded';
-  is_deeply \%got_opts, { a => 'foo', b => '', c => 1, v => 3 }, 'Options properly set';
+  ok getopts( 'a:b!cv', my %got_opts ), 'Succeeded';
+  is_deeply \%got_opts, { a => 'foo', b => '', c => 1, v => 1 }, 'Options properly set';
+  is @ARGV, 0, '@ARGV is empty'
+};
+
+subtest 'Increment flag value; plus ("+") flag indicator' => sub {
+  plan tests => 3;
+
+  $DB::single = 1;
+  local @ARGV = qw( -b -a foo -v -b -vv -c );
+  ok getopts( 'a:bcv+', my %got_opts ), 'Succeeded';
+  is_deeply \%got_opts, { a => 'foo', b => 1, c => 1, v => 3 }, 'Options properly set';
   is @ARGV, 0, '@ARGV is empty'
 };
 

@@ -24,7 +24,7 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
 
 This module reimplements the C<getopts()> function of the L<Getopts::Std>
 core module.  The new implementation supports only the two-parameter form
-of C<getopts()>.
+of C<getopts()> where the second parameter is not a hash reference but a hash.
 
 The first parameter (the options specification) is a string that contains
 the option characters. An option character has to be an alphanumeric character.
@@ -103,7 +103,8 @@ key in C<%opts>.
 
 Even if you are currently using the two-parameter form of the C<getopts()>
 function of C<Getopts::Std>, the new implementation isn't a drop in
-replacement.
+replacement. The most crucial change is the type of the second parameter. The
+second parameter is not a hash reference anymore but a hash.
 
 =head1 SEE ALSO
 
