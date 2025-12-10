@@ -70,16 +70,25 @@ C<@ARGV>. This module exports the C<getopts3()> function on request too.
 
 =head1 OPTION TYPES
 
-An option that requires no option-argument is called a flag. If a flag
-is provided, its hash value is C<1>, which in perl boolean context means
-true. If the same flag is provided multiple times, the implementation could
-keep the hash value. But for perl each positive integer is true in boolean
-context. Therefore each occurrence of the flag increments its hash value
-by one.  For example, this is useful for incrementing a verbosity level
-represented by the C<-v> flag.
+An option that requires no option-argument is called a flag.  A flag can
+(optional) have either an exclamation mark (C<!>) or a plus (C<+>) "flag
+indicator".  The indicator follows the flag character in the options
+specification (C<getopts()>'s first parameter).
+
+If a flag with no flag indicator is repeated, the perl boolean true value
+C<!!1> is assigned again and again to the flag character key in C<%opts>.
+
+If a (C<!>) flag is repeated, its initial C<undef> value will be logically
+negated on each occurrence (implies boolean autovivification) The final
+value is assigned to the flag character key in C<%opts>.
+
+If a (C<+>) flag is repeated, its initial C<undef> value will be incremented
+by one on each occurrence (implies numeric autovivification).  The final
+value is assigned to the flag character key in C<%opts>.  For example, this
+is useful for incrementing a verbosity level represented by the C<-v> flag.
 
 An option that requires an option-argument has either a colon (C<:>) or a
-comma (C<,>) option-argument indicator. The indicator follows the option
+comma (C<,>) "option-argument indicator". The indicator follows the option
 character in the options specification (C<getopts()>'s first parameter).
 
 If a C<:> option is repeated, the option-arguments overwrite each other and

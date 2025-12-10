@@ -5,11 +5,13 @@ use warnings;
 
 package Getopt::Guided;
 
-$Getopt::Guided::VERSION = 'v1.1.1';
+$Getopt::Guided::VERSION = 'v2.0.0';
 
 use Carp           qw( croak );
 use File::Basename qw( basename );
 
+# Flag Indicator Character Class
+sub FICC () { '[!+]' }
 # Option-Argument Indicator Character Class
 sub OAICC () { '[,:]' }
 
@@ -35,12 +37,12 @@ sub getopts3 ( \@$\% ) {
   # The croak message is slightly inaccurate because it does not mention the
   # optional option-argument indicator character
   croak "getopts: \$spec parameter isn't a string of alphanumeric characters, stopped"
-    unless $spec =~ m/\A (?: [[:alnum:]] ${ \( OAICC ) }? )+ \z/x;
+    unless $spec =~ m/\A (?: [[:alnum:]] (?: ${ \( FICC ) } | ${ \( OAICC ) } )? )+ \z/x;
   my @chars = split( //, $spec );
   {
     my %dups;
     for ( @chars ) {
-      next if m/\A ${ \( OAICC ) } \z/x;
+      next if m/\A ${ \( FICC ) } | ${ \( OAICC ) } \z/x;
       croak 'getopts: $spec parameter contains duplicate option characters, stopped'
         if exists $dups{ $_ };
       ++$dups{ $_ }
@@ -57,10 +59,8 @@ sub getopts3 ( \@$\% ) {
     shift @$argv, last if $argv->[ 0 ] eq '--';
     my $pos = index( $spec, $first );
     if ( $pos >= 0 ) {
-      # The option-argument indicator "," or ":" is the character that follows
-      # an option character if the option requires an option-argument
-      my $ind = $chars[ $pos + 1 ];
-      if ( defined $ind and $ind =~ m/\A ${ \( OAICC ) } \z/x ) {
+      my $ind = $chars[ $pos + 1 ] || '';
+      if ( $ind =~ m/\A ${ \( OAICC ) } \z/x ) {
         shift @$argv;
         if ( $rest eq '' ) {
           # Guideline 7
@@ -70,20 +70,29 @@ sub getopts3 ( \@$\% ) {
           @error = ( 'option requires an argument', $first ), last
             unless defined( my $val = shift @$argv );
           if ( $ind eq ':' ) {
-            # Option-argument overwrite situation!
+            # Standard behaviour: Overwrite option-argument
             $opts->{ $first } = $val
           } else {
-            # Create and fill list of option-arguments
+            # Create and fill list of option-arguments ( $ind eq ',' )
             $opts->{ $first } = [] unless exists $opts->{ $first };
             push @{ $opts->{ $first } }, $val
           }
         } else {
           # Guideline 5
           @error = ( "option with argument isn't last one in group", $first );
-          last;
+          last
         }
       } else {
-        ++$opts->{ $first };
+        if ( $ind eq '' ) {
+          # Standard behaviour: Assign perl boolean true value
+          $opts->{ $first } = !!1
+        } elsif ( $ind eq '!' ) {
+          # Negate logically
+          $opts->{ $first } = !!!$opts->{ $first }
+        } else {
+          # Increment ( $ind eq '+' )
+          ++$opts->{ $first }
+        }
         if ( $rest eq '' ) {
           shift @$argv
         } else {

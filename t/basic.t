@@ -165,17 +165,17 @@ subtest 'Overwrite option-argument' => sub {
   plan tests => 3;
 
   local @ARGV = qw( -a foo -b -a bar -c );
-  ok getopts( 'a:bc', my %got_opts ), 'Succeeded';
+  ok getopts( 'a:b!c', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => 'bar', b => 1, c => 1 }, 'Options properly set';
   is @ARGV, 0, '@ARGV is empty'
 };
 
-subtest 'Increment flag value' => sub {
+subtest 'Logically negate flag value (-b) and increment flag value (-v)' => sub {
   plan tests => 3;
 
-  local @ARGV = qw( -a foo -v -b -vv -c );
-  ok getopts( 'a:bcv', my %got_opts ), 'Succeeded';
-  is_deeply \%got_opts, { a => 'foo', b => 1, c => 1, v => 3 }, 'Options properly set';
+  local @ARGV = qw( -b -a foo -v -b -vv -c );
+  ok getopts( 'a:b!cv+', my %got_opts ), 'Succeeded';
+  is_deeply \%got_opts, { a => 'foo', b => '', c => 1, v => 3 }, 'Options properly set';
   is @ARGV, 0, '@ARGV is empty'
 };
 
@@ -233,7 +233,7 @@ subtest 'POD synopsis (getopts processing)' => sub {
   plan tests => 3;
 
   local @ARGV = qw( -d dv1 -c -v -a av1 -d dv2 -a av2 -d -- -vv v1 v2 );
-  ok getopts( 'a:bcd,v', my %got_opts ), 'Succeeded';
+  ok getopts( 'a:bcd,v+', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => 'av2', c => 1, d => [ 'dv1', 'dv2', '--' ], v => 3 }, 'Options properly set';
   is_deeply \@ARGV, [ qw( v1 v2 ) ], 'Options removed from @ARGV'
 };
@@ -243,7 +243,7 @@ subtest 'POD synopsis (getopts3 processing)' => sub {
 
   # On purpose don't work with a localized @ARGV
   my @argv = qw( -d dv1 -c -v -a av1 -d dv2 -a av2 -d -- -vv v1 v2 );
-  ok getopts3( @argv, 'a:bcd,v', my %got_opts ), 'Succeeded';
+  ok getopts3( @argv, 'a:bcd,v+', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => 'av2', c => 1, d => [ 'dv1', 'dv2', '--' ], v => 3 }, 'Options properly set';
   is_deeply \@argv, [ qw( v1 v2 ) ], 'Options removed from @argv'
 }
