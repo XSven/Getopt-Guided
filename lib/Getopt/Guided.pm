@@ -45,54 +45,54 @@ sub getopts3 ( \@$\% ) {
   # Guideline 4, Guideline 9
   while ( @$argv and my ( $name, $rest ) = ( $argv->[ 0 ] =~ m/\A - (.) (.*)/x ) ) {
     # Guideline 10
-    shift @$argv, last if $argv->[ 0 ] eq '--';
-    if ( index( $spec, $name ) >= 0 ) {
-      my $indicator = $name_to_indicator->{ $name };
-      if ( $indicator =~ m/\A ${ \( OAICC ) } \z/x ) {
-        # Option has an option-argument
-        shift @$argv;
-        if ( $rest eq '' ) {
-          # Guideline 7
-          @error = ( 'option requires an argument', $name ), last
-            unless @$argv;
-          # Guideline 6, Guideline 8
-          @error = ( 'option requires an argument', $name ), last
-            unless defined( my $value = shift @$argv );
-          if ( $indicator eq ':' ) {
-            # Standard behaviour: Overwrite option-argument
-            $opts->{ $name } = $value
-          } else {
-            # Create and fill list of option-arguments ( $indicator eq ',' )
-            $opts->{ $name } = [] unless exists $opts->{ $name };
-            push @{ $opts->{ $name } }, $value
-          }
-        } else {
-          # Guideline 5
-          @error = ( "option with argument isn't last one in group", $name );
-          last
-        }
+    shift @$argv, last
+      if $argv->[ 0 ] eq '--';
+    @error = ( 'illegal option', $name ), last
+      unless index( $spec, $name ) >= 0; ## no critic ( ProhibitNegativeExpressionsInUnlessAndUntilConditions )
+
+    my $indicator = $name_to_indicator->{ $name };
+    if ( $indicator =~ m/\A ${ \( OAICC ) } \z/x ) {
+      # Case: Option has an option-argument
+      # Guideline 5
+      @error = ( "option with argument isn't last one in group", $name ), last
+        unless $rest eq '';
+      # Shift delimeted option name
+      shift @$argv;
+      # Guideline 7
+      @error = ( 'option requires an argument', $name ), last
+        unless @$argv;
+      # Guideline 6, Guideline 8
+      @error = ( 'option requires an argument', $name ), last
+        unless defined( my $value = shift @$argv );
+      if ( $indicator eq ':' ) {
+        # Standard behaviour: Overwrite option-argument
+        $opts->{ $name } = $value
       } else {
-        # Option is a flag
-        if ( $indicator eq '' ) {
-          # Standard behaviour: Assign perl boolean true value
-          $opts->{ $name } = !!1
-        } elsif ( $indicator eq '!' ) {
-          # Negate logically
-          $opts->{ $name } = !!!$opts->{ $name }
-        } else {
-          # Increment ( $indicator eq '+' )
-          ++$opts->{ $name }
-        }
-        if ( $rest eq '' ) {
-          shift @$argv
-        } else {
-          # Guideline 5
-          $argv->[ 0 ] = "-$rest" ## no critic ( RequireLocalizedPunctuationVars )
-        }
+        # Create and fill list of option-arguments ( $indicator eq ',' )
+        $opts->{ $name } = [] unless exists $opts->{ $name };
+        push @{ $opts->{ $name } }, $value
       }
     } else {
-      @error = ( 'illegal option', $name ), last
+      # Case: Option is a flag
+      if ( $indicator eq '' ) {
+        # Standard behaviour: Assign perl boolean true value
+        $opts->{ $name } = !!1
+      } elsif ( $indicator eq '!' ) {
+        # Negate logically
+        $opts->{ $name } = !!!$opts->{ $name }
+      } else {
+        # Increment ( $indicator eq '+' )
+        ++$opts->{ $name }
+      }
+      if ( $rest eq '' ) {
+        # Shift delimeted option name
+        shift @$argv
+      } else {
+        # Guideline 5
+        $argv->[ 0 ] = "-$rest" ## no critic ( RequireLocalizedPunctuationVars )
+      }
     }
+
   }
 
   if ( @error ) {
