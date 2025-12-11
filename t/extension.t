@@ -23,7 +23,6 @@ subtest 'Logically negate flag value; exclamation mark ("!") flag indicator' => 
 subtest 'Increment flag value; plus ("+") flag indicator' => sub {
   plan tests => 3;
 
-  $DB::single = 1;
   local @ARGV = qw( -b -a foo -v -b -vv -c );
   ok getopts( 'a:bcv+', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => 'foo', b => 1, c => 1, v => 3 }, 'Options properly set';

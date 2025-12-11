@@ -30,24 +30,29 @@ sub import {
   }
 }
 
+# Implementation is based on m//gc with \G
+sub _prepare_name_to_ind ( $ ) {
+  my $spec = shift;
+
+  my $name_to_ind;
+  while ( $spec =~ m/\G ( [[:alnum:]] ) ( ${ \( FICC ) } | ${ \( OAICC ) } | )/gcx ) {
+    my ( $name, $ind ) = ( $1, $2 );
+    croak "getopts: \$spec parameter contains option '$name' multiple times, stopped"
+      if exists $name_to_ind->{ $name };
+    $name_to_ind->{ $name } = $ind;
+  }
+  my $offset = pos $spec;
+  croak "getopts: \$spec parameter isn't a string of alphanumeric characters, stopped"
+    unless defined $offset and $offset == length $spec;
+
+  $name_to_ind
+}
+
 # https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02>
 sub getopts3 ( \@$\% ) {
   my ( $argv, $spec, $opts ) = @_;
 
-  # The croak message is slightly inaccurate because it does not mention the
-  # optional option-argument indicator character
-  croak "getopts: \$spec parameter isn't a string of alphanumeric characters, stopped"
-    unless $spec =~ m/\A (?: [[:alnum:]] (?: ${ \( FICC ) } | ${ \( OAICC ) } )? )+ \z/x;
-  my @chars = split( //, $spec );
-  {
-    my %dups;
-    for ( @chars ) {
-      next if m/\A ${ \( FICC ) } | ${ \( OAICC ) } \z/x;
-      croak 'getopts: $spec parameter contains duplicate option characters, stopped'
-        if exists $dups{ $_ };
-      ++$dups{ $_ }
-    }
-  }
+  my $name_to_ind = _prepare_name_to_ind $spec;
   croak "getopts: \$opts parameter hash isn't empty, stopped"
     if %$opts;
 
@@ -59,7 +64,7 @@ sub getopts3 ( \@$\% ) {
     shift @$argv, last if $argv->[ 0 ] eq '--';
     my $pos = index( $spec, $first );
     if ( $pos >= 0 ) {
-      my $ind = $chars[ $pos + 1 ] || '';
+      my $ind = $name_to_ind->{ $first };
       if ( $ind =~ m/\A ${ \( OAICC ) } \z/x ) {
         shift @$argv;
         if ( $rest eq '' ) {
