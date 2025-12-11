@@ -17,8 +17,25 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
   getopts3 @ARGV, 'a:bcd,v+', my %opts;
 
   # result
-  # %opts == ( a => 'av2', c => 1, d => [ 'dv1', 'dv2', '--' ], v => 3 )
+  # %opts == ( a => 'av2', c => !!1, d => [ 'dv1', 'dv2', '--' ], v => 3 )
   # @ARGV == ( 'v1', 'v2' )
+
+
+=head1 ABOUT OPTIONS
+
+An option (command-line option) has a name that is a single alphanumeric
+(C<[[:alnum:]]>) character. It has a delimiter (prefix delimiter) that is
+a hyphen (C<->) character.
+
+Some options require an argument (option-argument). If an option requires
+an argument, an indicator (option-argument indicator) is attached to its
+name. This indicator is either a colon (C<:>) or a comma (C<,>). The POSIX
+standard knows only the colon indicator.
+
+An option that requires no argument is called a flag.  A flag can
+(optional!) have an indicator (flag indicator) too. This indicator is either
+an exclamation mark (C<!>) or a plus sign (C<+>). The POSIX standard doesn't
+know the flag indicator feature.
 
 =head1 DESCRIPTION
 
@@ -26,13 +43,13 @@ This module reimplements the C<getopts()> function of the L<Getopts::Std>
 core module.  The new implementation supports only the two-parameter form
 of C<getopts()> where the second parameter is not a hash reference but a hash.
 
-The first parameter (the options specification) is a string that contains
-the option characters. An option character has to be an alphanumeric character.
+The first parameter is the "options specification". It is a string that contains
+a joined list of options (C<E<lt>nameE<gt>[ E<lt>indicatorE<gt> ]>).
 
-The second parameter is an empty hash (passed by reference) that stores the
-processing result. Each hash key refers to a provided option character and
-the corresponding hash value refers to the option-argument (or C<1> if it
-is a flag).
+The second parameter is the "name-value map". It is an empty hash (passed
+by reference) that stores the C<getopts()> processing result. Each hash
+key refers to an option name and the corresponding hash value refers to the
+option-argument value (or C<!!1> if it is a flag).
 
 This module exports the C<getopts()> function on request.
 
@@ -64,9 +81,9 @@ If any of the processing errors occurs, C<getopts()> restores C<@ARGV>
 before it warns and returns false.
 
 As of version 1.1.0 this module provides the additional function C<getopts3()>.
-This function has a 3rd leading parameter. The parameter is an array
-(passed by reference) of argument values. It replaces the implicit use of
-C<@ARGV>. This module exports the C<getopts3()> function on request too.
+This function has a 3rd leading parameter. The parameter is an array (passed
+by reference) of command-line argument values. It replaces the implicit use
+of C<@ARGV>. This module exports the C<getopts3()> function on request too.
 
 =head1 OPTION TYPES
 
