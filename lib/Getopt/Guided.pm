@@ -49,6 +49,7 @@ sub getopts3 ( \@$\% ) {
     if ( index( $spec, $name ) >= 0 ) {
       my $indicator = $name_to_indicator->{ $name };
       if ( $indicator =~ m/\A ${ \( OAICC ) } \z/x ) {
+        # Option has an option-argument
         shift @$argv;
         if ( $rest eq '' ) {
           # Guideline 7
@@ -71,6 +72,7 @@ sub getopts3 ( \@$\% ) {
           last
         }
       } else {
+        # Option is a flag
         if ( $indicator eq '' ) {
           # Standard behaviour: Assign perl boolean true value
           $opts->{ $name } = !!1
