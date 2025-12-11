@@ -22,81 +22,64 @@ sub import {
 
   our @EXPORT_OK;
   my $target = caller;
-  for my $func ( @_ ) {
-    croak "$module: '$func' is not exported, stopped"
-      unless grep { $func eq $_ } @EXPORT_OK;
+  for my $function ( @_ ) {
+    croak "$module: '$function' is not exported, stopped"
+      unless grep { $function eq $_ } @EXPORT_OK;
     no strict 'refs'; ## no critic ( ProhibitNoStrict )
-    *{ "$target\::$func" } = $module->can( $func )
+    *{ "$target\::$function" } = $module->can( $function )
   }
 }
 
-# Implementation is based on m//gc with \G
-sub _prepare_name_to_ind ( $ ) {
-  my $spec = shift;
-
-  my $name_to_ind;
-  while ( $spec =~ m/\G ( [[:alnum:]] ) ( ${ \( FICC ) } | ${ \( OAICC ) } | )/gcx ) {
-    my ( $name, $ind ) = ( $1, $2 );
-    croak "getopts: \$spec parameter contains option '$name' multiple times, stopped"
-      if exists $name_to_ind->{ $name };
-    $name_to_ind->{ $name } = $ind;
-  }
-  my $offset = pos $spec;
-  croak "getopts: \$spec parameter isn't a string of alphanumeric characters, stopped"
-    unless defined $offset and $offset == length $spec;
-
-  $name_to_ind
-}
+sub _prepare_name_to_indicator ( $ );
 
 # https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02>
 sub getopts3 ( \@$\% ) {
   my ( $argv, $spec, $opts ) = @_;
 
-  my $name_to_ind = _prepare_name_to_ind $spec;
+  my $name_to_indicator = _prepare_name_to_indicator $spec;
   croak "getopts: \$opts parameter hash isn't empty, stopped"
     if %$opts;
 
   my @argv_backup = @$argv;
   my @error;
   # Guideline 4, Guideline 9
-  while ( @$argv and my ( $first, $rest ) = ( $argv->[ 0 ] =~ m/\A-(.)(.*)/ ) ) {
+  while ( @$argv and my ( $name, $rest ) = ( $argv->[ 0 ] =~ m/\A - (.) (.*)/x ) ) {
     # Guideline 10
     shift @$argv, last if $argv->[ 0 ] eq '--';
-    my $pos = index( $spec, $first );
-    if ( $pos >= 0 ) {
-      my $ind = $name_to_ind->{ $first };
-      if ( $ind =~ m/\A ${ \( OAICC ) } \z/x ) {
+    if ( index( $spec, $name ) >= 0 ) {
+      my $indicator = $name_to_indicator->{ $name };
+      if ( $indicator =~ m/\A ${ \( OAICC ) } \z/x ) {
         shift @$argv;
         if ( $rest eq '' ) {
           # Guideline 7
-          @error = ( 'option requires an argument', $first ), last
+          @error = ( 'option requires an argument', $name ), last
             unless @$argv;
           # Guideline 6, Guideline 8
-          @error = ( 'option requires an argument', $first ), last
-            unless defined( my $val = shift @$argv );
-          if ( $ind eq ':' ) {
+          @error = ( 'option requires an argument', $name ), last
+            unless defined( my $value = shift @$argv );
+          if ( $indicator eq ':' ) {
             # Standard behaviour: Overwrite option-argument
-            $opts->{ $first } = $val
+            $opts->{ $name } = $value
           } else {
-            # Create and fill list of option-arguments ( $ind eq ',' )
-            $opts->{ $first } = [] unless exists $opts->{ $first };
-            push @{ $opts->{ $first } }, $val
+            # Create and fill list of option-arguments ( $indicator eq ',' )
+            $opts->{ $name } = [] unless exists $opts->{ $name };
+            push @{ $opts->{ $name } }, $value
           }
         } else {
           # Guideline 5
-          @error = ( "option with argument isn't last one in group", $first );
+          @error = ( "option with argument isn't last one in group", $name );
           last
         }
       } else {
-        if ( $ind eq '' ) {
+        if ( $indicator eq '' ) {
           # Standard behaviour: Assign perl boolean true value
-          $opts->{ $first } = !!1
-        } elsif ( $ind eq '!' ) {
+          $opts->{ $name } = !!1
+        } elsif ( $indicator eq '!' ) {
           # Negate logically
-          $opts->{ $first } = !!!$opts->{ $first }
+          $opts->{ $name } = !!!$opts->{ $name }
         } else {
-          # Increment ( $ind eq '+' )
-          ++$opts->{ $first }
+          # Increment ( $indicator eq '+' )
+          ++$opts->{ $name }
         }
         if ( $rest eq '' ) {
           shift @$argv
@@ -106,7 +89,7 @@ sub getopts3 ( \@$\% ) {
         }
       }
     } else {
-      @error = ( 'illegal option', $first ), last
+      @error = ( 'illegal option', $name ), last
     }
   }
 
@@ -126,6 +109,24 @@ sub getopts ( $\% ) {
   my ( $spec, $opts ) = @_;
 
   getopts3 @ARGV, $spec, %$opts
+}
+
+# Implementation is based on m//gc with \G
+sub _prepare_name_to_indicator ( $ ) {
+  my $spec = shift;
+
+  my $name_to_indicator;
+  while ( $spec =~ m/\G ( [[:alnum:]] ) ( ${ \( FICC ) } | ${ \( OAICC ) } | )/gcx ) {
+    my ( $name, $indicator ) = ( $1, $2 );
+    croak "getopts: \$spec parameter contains option '$name' multiple times, stopped"
+      if exists $name_to_indicator->{ $name };
+    $name_to_indicator->{ $name } = $indicator;
+  }
+  my $offset = pos $spec;
+  croak "getopts: \$spec parameter isn't a string of alphanumeric characters, stopped"
+    unless defined $offset and $offset == length $spec;
+
+  $name_to_indicator
 }
 
 1
