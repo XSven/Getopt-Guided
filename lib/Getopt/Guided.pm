@@ -43,7 +43,7 @@ sub getopts3 ( \@$\% ) {
   my @argv_backup = @$argv;
   my @error;
   # Guideline 4, Guideline 9
-  while ( @$argv and my ( $name, $rest ) = ( $argv->[ 0 ] =~ m/\A - (.) (.*)/x ) ) {
+  while ( @$argv and my ( $name, $rest ) = ( $argv->[ 0 ] =~ m/\A - (.) (.*)/ox ) ) {
     # Guideline 10
     shift @$argv, last
       if $argv->[ 0 ] eq '--';
@@ -51,7 +51,7 @@ sub getopts3 ( \@$\% ) {
       unless index( $spec, $name ) >= 0; ## no critic ( ProhibitNegativeExpressionsInUnlessAndUntilConditions )
 
     my $indicator = $name_to_indicator->{ $name };
-    if ( $indicator =~ m/\A ${ \( OAICC ) } \z/x ) {
+    if ( $indicator =~ m/\A ${ \( OAICC ) } \z/ox ) {
       # Case: Option has an option-argument
       # Guideline 5
       @error = ( "option with argument isn't last one in group", $name ), last
@@ -118,7 +118,7 @@ sub _prepare_name_to_indicator ( $ ) {
   my $spec = shift;
 
   my $name_to_indicator;
-  while ( $spec =~ m/\G ( [[:alnum:]] ) ( ${ \( FICC ) } | ${ \( OAICC ) } | )/gcx ) {
+  while ( $spec =~ m/\G ( [[:alnum:]] ) ( ${ \( FICC ) } | ${ \( OAICC ) } | )/gcox ) {
     my ( $name, $indicator ) = ( $1, $2 );
     croak "getopts: \$spec parameter contains option '$name' multiple times, stopped"
       if exists $name_to_indicator->{ $name };
