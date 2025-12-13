@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is is_deeply like ok plan subtest use_ok ) ], tests => 19;
+use Test::More import => [ qw( BAIL_OUT is is_deeply like ok plan subtest use_ok ) ], tests => 20;
 use Test::Fatal qw( exception lives_ok );
 use Test::Warn  qw( warning_like );
 
@@ -47,6 +47,15 @@ subtest 'Single option with option-argument' => sub {
   local @ARGV = qw( -a foo );
   ok getopts( 'a:', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => 'foo' }, 'Option has option-argument';
+  is @ARGV, 0, '@ARGV is empty'
+};
+
+subtest 'Empty @ARGV' => sub {
+  plan tests => 3;
+
+  local @ARGV = ();
+  ok getopts( 'a:b', my %got_opts ), 'Succeeded';
+  is_deeply \%got_opts, {}, '%got_opts is empty';
   is @ARGV, 0, '@ARGV is empty'
 };
 
