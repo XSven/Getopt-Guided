@@ -74,14 +74,14 @@ sub getopts3 ( \@$\% ) {
       }
     } else {
       # Case: Option is a flag
-      if ( $indicator eq '' ) {
-        # Standard behaviour: Assign perl boolean true value
+      if ( not exists $opts->{ $name } ) {
+        # Initialisation: Assign perl boolean true value ( IV == 1 )
         $opts->{ $name } = !!1
       } elsif ( $indicator eq '!' ) {
         # Negate logically
-        $opts->{ $name } = !!!$opts->{ $name }
-      } else {
-        # Increment ( $indicator eq '+' )
+        $opts->{ $name } = not $opts->{ $name }
+      } elsif ( $indicator eq '+' ) {
+        # Increment
         ++$opts->{ $name }
       }
       if ( $rest eq '' ) {
