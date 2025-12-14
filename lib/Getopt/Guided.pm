@@ -34,11 +34,11 @@ sub import {
 
 # Implementation is based on m//gc with \G
 sub parse_spec ( $ ) {
-  use warnings FATAL => qw( uninitialized );
 
   my $spec = shift;
 
   my $spec_as_hash;
+  no warnings qw( uninitialized );
   while ( $spec =~ m/\G ( [[:alnum:]] ) ( ${ \( FICC ) } | ${ \( OAICC ) } | )/gcox ) {
     my ( $name, $indicator ) = ( $1, $2 );
     croak "parse_spec: \$spec parameter contains option '$name' multiple times, stopped"

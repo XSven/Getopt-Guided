@@ -19,7 +19,7 @@ subtest 'Validate $spec parameter' => sub {
 
   local @ARGV = ();
   my %opts;
-  like exception { getopts undef, %opts }, qr/Use of uninitialized value/, 'Undefined value is not allowed';
+  like exception { getopts undef, %opts }, qr/isn't a non-empty string of alphanumeric/, 'Undefined value is not allowed';
   like exception { getopts '',     %opts }, qr/isn't a non-empty string of alphanumeric/, 'Empty value is not allowed';
   like exception { getopts 'a:-b', %opts }, qr/isn't a non-empty string of alphanumeric/, "'-' character is not allowed";
   like exception { getopts ':a:b', %opts }, qr/isn't a non-empty string of alphanumeric/,
