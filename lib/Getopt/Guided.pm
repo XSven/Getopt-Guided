@@ -127,7 +127,7 @@ sub parse_spec ( $ ) {
     $spec_as_hash->{ $name } = $indicator;
   }
   my $offset = pos $spec;
-  croak "parse_spec: \$spec parameter isn't a string of alphanumeric characters, stopped"
+  croak "parse_spec: \$spec parameter isn't a non-empty string of alphanumeric characters, stopped"
     unless defined $offset and $offset == length $spec;
 
   $spec_as_hash

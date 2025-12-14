@@ -17,11 +17,14 @@ like exception { $module->import( '_private' ) }, qr/not exported/, 'Export erro
 subtest 'Validate $spec parameter' => sub {
   plan tests => 5;
 
+  local @ARGV = ();
   my %opts;
-  like exception { getopts '',     %opts }, qr/isn't a string of alphanumeric/, 'Empty value is not allowed';
-  like exception { getopts 'a:-b', %opts }, qr/isn't a string of alphanumeric/, "'-' character is not allowed";
-  like exception { getopts ':a:b', %opts }, qr/isn't a string of alphanumeric/, "Leading ':' character is not allowed";
-  like exception { getopts 'aba:', %opts }, qr/multiple times/,                 'Same option character is not allowed';
+  #getopts undef, %opts;
+  like exception { getopts '',     %opts }, qr/isn't a non-empty string of alphanumeric/, 'Empty value is not allowed';
+  like exception { getopts 'a:-b', %opts }, qr/isn't a non-empty string of alphanumeric/, "'-' character is not allowed";
+  like exception { getopts ':a:b', %opts }, qr/isn't a non-empty string of alphanumeric/,
+    "Leading ':' character is not allowed";
+  like exception { getopts 'aba:', %opts }, qr/multiple times/, 'Same option character is not allowed';
   ok getopts( 'a:b', %opts ), 'Succeeded'
 };
 
