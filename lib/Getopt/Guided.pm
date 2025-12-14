@@ -32,13 +32,13 @@ sub import {
   }
 }
 
-sub _prepare_name_to_indicator ( $ );
+sub parse_spec ( $ );
 
 # https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02>
 sub getopts3 ( \@$\% ) {
   my ( $argv, $spec, $opts ) = @_;
 
-  my $name_to_indicator = _prepare_name_to_indicator $spec;
+  my $spec_as_hash = parse_spec $spec;
   croak "getopts: \$opts parameter hash isn't empty, stopped"
     if %$opts;
 
@@ -50,9 +50,9 @@ sub getopts3 ( \@$\% ) {
     shift @$argv, last
       if $argv->[ 0 ] eq '--';
     @error = ( 'illegal option', $name ), last
-      unless exists $name_to_indicator->{ $name }; ## no critic ( ProhibitNegativeExpressionsInUnlessAndUntilConditions )
+      unless exists $spec_as_hash->{ $name }; ## no critic ( ProhibitNegativeExpressionsInUnlessAndUntilConditions )
 
-    my $indicator = $name_to_indicator->{ $name };
+    my $indicator = $spec_as_hash->{ $name };
     if ( $indicator =~ m/\A ${ \( OAICC ) } \z/ox ) {
       # Case: Option has an option-argument
       # Guideline 5
@@ -116,21 +116,21 @@ sub getopts ( $\% ) {
 }
 
 # Implementation is based on m//gc with \G
-sub _prepare_name_to_indicator ( $ ) {
+sub parse_spec ( $ ) {
   my $spec = shift;
 
-  my $name_to_indicator;
+  my $spec_as_hash;
   while ( $spec =~ m/\G ( [[:alnum:]] ) ( ${ \( FICC ) } | ${ \( OAICC ) } | )/gcox ) {
     my ( $name, $indicator ) = ( $1, $2 );
-    croak "getopts: \$spec parameter contains option '$name' multiple times, stopped"
-      if exists $name_to_indicator->{ $name };
-    $name_to_indicator->{ $name } = $indicator;
+    croak "parse_spec: \$spec parameter contains option '$name' multiple times, stopped"
+      if exists $spec_as_hash->{ $name };
+    $spec_as_hash->{ $name } = $indicator;
   }
   my $offset = pos $spec;
-  croak "getopts: \$spec parameter isn't a string of alphanumeric characters, stopped"
+  croak "parse_spec: \$spec parameter isn't a string of alphanumeric characters, stopped"
     unless defined $offset and $offset == length $spec;
 
-  $name_to_indicator
+  $spec_as_hash
 }
 
 1
