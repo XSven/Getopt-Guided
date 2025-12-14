@@ -117,6 +117,8 @@ sub getopts ( $\% ) {
 
 # Implementation is based on m//gc with \G
 sub parse_spec ( $ ) {
+  use warnings FATAL => qw( uninitialized );
+
   my $spec = shift;
 
   my $spec_as_hash;

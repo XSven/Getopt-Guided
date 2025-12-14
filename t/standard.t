@@ -15,11 +15,11 @@ BEGIN {
 like exception { $module->import( '_private' ) }, qr/not exported/, 'Export error';
 
 subtest 'Validate $spec parameter' => sub {
-  plan tests => 5;
+  plan tests => 6;
 
   local @ARGV = ();
   my %opts;
-  #getopts undef, %opts;
+  like exception { getopts undef, %opts }, qr/Use of uninitialized value/, 'Undefined value is not allowed';
   like exception { getopts '',     %opts }, qr/isn't a non-empty string of alphanumeric/, 'Empty value is not allowed';
   like exception { getopts 'a:-b', %opts }, qr/isn't a non-empty string of alphanumeric/, "'-' character is not allowed";
   like exception { getopts ':a:b', %opts }, qr/isn't a non-empty string of alphanumeric/,
