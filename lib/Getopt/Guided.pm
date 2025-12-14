@@ -14,6 +14,8 @@ use File::Basename qw( basename );
 sub FICC () { '[!+]' }
 # Option-Argument Indicator Character Class
 sub OAICC () { '[,:]' }
+# Perl boolean true value ( IV == 1 )
+sub TRUE () { !!1 }
 
 @Getopt::Guided::EXPORT_OK = qw( getopts getopts3 );
 
@@ -75,8 +77,8 @@ sub getopts3 ( \@$\% ) {
     } else {
       # Case: Option is a flag
       if ( not exists $opts->{ $name } ) {
-        # Initialisation: Assign perl boolean true value ( IV == 1 )
-        $opts->{ $name } = !!1
+        # Initialisation
+        $opts->{ $name } = TRUE
       } elsif ( $indicator eq '!' ) {
         # Negate logically
         $opts->{ $name } = not $opts->{ $name }

@@ -43,8 +43,9 @@ This module reimplements the C<getopts()> function of the L<Getopts::Std>
 core module.  The new implementation supports only the two-parameter form
 of C<getopts()> where the second parameter is not a hash reference but a hash.
 
-The first parameter is the "options specification". It is a string that contains
-a joined list of options (C<E<lt>nameE<gt> [ E<lt>indicatorE<gt> ]>).
+The first parameter is the "options specification" C<$spec>. It is a string
+that contains a joined list of options (C<E<lt>nameE<gt> [ E<lt>indicatorE<gt>
+]>).
 
 The second parameter is the "name-value map" C<%opts>. It is an empty hash
 (passed by reference) that stores the C<getopts()> processing result. Each
