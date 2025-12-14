@@ -50,7 +50,7 @@ sub getopts3 ( \@$\% ) {
     shift @$argv, last
       if $argv->[ 0 ] eq '--';
     @error = ( 'illegal option', $name ), last
-      unless index( $spec, $name ) >= 0; ## no critic ( ProhibitNegativeExpressionsInUnlessAndUntilConditions )
+      unless exists $name_to_indicator->{ $name }; ## no critic ( ProhibitNegativeExpressionsInUnlessAndUntilConditions )
 
     my $indicator = $name_to_indicator->{ $name };
     if ( $indicator =~ m/\A ${ \( OAICC ) } \z/ox ) {
