@@ -32,7 +32,25 @@ sub import {
   }
 }
 
-sub parse_spec ( $ );
+# Implementation is based on m//gc with \G
+sub parse_spec ( $ ) {
+  use warnings FATAL => qw( uninitialized );
+
+  my $spec = shift;
+
+  my $spec_as_hash;
+  while ( $spec =~ m/\G ( [[:alnum:]] ) ( ${ \( FICC ) } | ${ \( OAICC ) } | )/gcox ) {
+    my ( $name, $indicator ) = ( $1, $2 );
+    croak "parse_spec: \$spec parameter contains option '$name' multiple times, stopped"
+      if exists $spec_as_hash->{ $name };
+    $spec_as_hash->{ $name } = $indicator;
+  }
+  my $offset = pos $spec;
+  croak "parse_spec: \$spec parameter isn't a non-empty string of alphanumeric characters, stopped"
+    unless defined $offset and $offset == length $spec;
+
+  $spec_as_hash
+}
 
 # https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02>
 sub getopts3 ( \@$\% ) {
@@ -113,26 +131,6 @@ sub getopts ( $\% ) {
   my ( $spec, $opts ) = @_;
 
   getopts3 @ARGV, $spec, %$opts
-}
-
-# Implementation is based on m//gc with \G
-sub parse_spec ( $ ) {
-  use warnings FATAL => qw( uninitialized );
-
-  my $spec = shift;
-
-  my $spec_as_hash;
-  while ( $spec =~ m/\G ( [[:alnum:]] ) ( ${ \( FICC ) } | ${ \( OAICC ) } | )/gcox ) {
-    my ( $name, $indicator ) = ( $1, $2 );
-    croak "parse_spec: \$spec parameter contains option '$name' multiple times, stopped"
-      if exists $spec_as_hash->{ $name };
-    $spec_as_hash->{ $name } = $indicator;
-  }
-  my $offset = pos $spec;
-  croak "parse_spec: \$spec parameter isn't a non-empty string of alphanumeric characters, stopped"
-    unless defined $offset and $offset == length $spec;
-
-  $spec_as_hash
 }
 
 1
