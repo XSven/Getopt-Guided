@@ -38,7 +38,7 @@ sub parse_spec ( $ ) {
   my $spec = shift;
 
   my $spec_as_hash;
-  no warnings qw( uninitialized );
+  no warnings qw( uninitialized ); ## no critic ( ProhibitNoWarnings )
   while ( $spec =~ m/\G ( [[:alnum:]] ) ( ${ \( FICC ) } | ${ \( OAICC ) } | )/gcox ) {
     my ( $name, $indicator ) = ( $1, $2 );
     croak "parse_spec: \$spec parameter contains option '$name' multiple times, stopped"
