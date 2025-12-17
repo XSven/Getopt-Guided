@@ -5,7 +5,7 @@ use warnings;
 
 package Getopt::Guided;
 
-$Getopt::Guided::VERSION = 'v2.0.0';
+$Getopt::Guided::VERSION = 'v2.0.1';
 
 use Carp           qw( croak );
 use File::Basename qw( basename );
@@ -34,7 +34,6 @@ sub import {
 
 # Implementation is based on m//gc with \G
 sub parse_spec ( $ ) {
-
   my $spec = shift;
 
   my $spec_as_hash;
@@ -43,7 +42,7 @@ sub parse_spec ( $ ) {
     my ( $name, $indicator ) = ( $1, $2 );
     croak "parse_spec: \$spec parameter contains option '$name' multiple times, stopped"
       if exists $spec_as_hash->{ $name };
-    $spec_as_hash->{ $name } = $indicator;
+    $spec_as_hash->{ $name } = $indicator
   }
   my $offset = pos $spec;
   croak "parse_spec: \$spec parameter isn't a non-empty string of alphanumeric characters, stopped"
@@ -121,7 +120,7 @@ sub getopts3 ( \@$\% ) {
     %$opts = ();
     # Prepare and print warning message:
     # Program name, type of error, and invalid option character
-    warn sprintf( "%s: %s -- %s\n", basename( $0 ), @error ); ## no critic ( RequireCarping )
+    warn sprintf( "%s: %s -- %s\n", basename( $0 ), @error ) ## no critic ( RequireCarping )
   }
 
   @error == 0
