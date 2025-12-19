@@ -9,5 +9,6 @@ README
 t/examples/broken
 t/examples/fine
 t/extension.t
+t/processopts.t
 t/standard.t
 t/utility.t

@@ -16,8 +16,10 @@ sub FICC () { '[!+]' }
 sub OAICC () { '[,:]' }
 # Perl boolean true value ( IV == 1 )
 sub TRUE () { !!1 }
+# Perl boolean false value
+sub FALSE () { !!0 }
 
-@Getopt::Guided::EXPORT_OK = qw( getopts getopts3 );
+@Getopt::Guided::EXPORT_OK = qw( getopts getopts3 processopts );
 
 sub import {
   my $module = shift;
@@ -130,6 +132,24 @@ sub getopts ( $\% ) {
   my ( $spec, $opts ) = @_;
 
   getopts3 @ARGV, $spec, %$opts
+}
+
+sub processopts ( @ ) {
+  my $spec = do {
+    use warnings FATAL => qw( misc uninitialized );
+    join '', keys %{ +{ @_ } };
+  };
+
+  return FALSE unless getopts3 @ARGV, $spec, my %opts;
+
+  for ( my $i = 0 ; $i < @_ ; $i += 2 ) {
+    # If $_[ $i ] refers to a flag with no indicator, the split still returns
+    # the empty string (not undef!) as the value for the indicator
+    my ( $name, $indicator ) = split //, $_[ $i ];
+    $_[ $i + 1 ]->( $opts{ $name }, $name, $indicator ) if exists $opts{ $name }
+  }
+
+  TRUE
 }
 
 1
