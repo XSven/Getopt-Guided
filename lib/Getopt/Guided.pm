@@ -35,29 +35,37 @@ sub import {
 }
 
 # Implementation is based on m//gc with \G
-sub parse_spec ( $ ) {
-  my $spec = shift;
+sub parse_spec ( $\%;$ ) {
+  my ( $spec, $spec_as_hash, $spec_length_expected ) = @_;
 
-  my $spec_as_hash;
+  my $spec_length_got;
   no warnings qw( uninitialized ); ## no critic ( ProhibitNoWarnings )
   while ( $spec =~ m/\G ( [[:alnum:]] ) ( ${ \( FICC ) } | ${ \( OAICC ) } | )/gcox ) {
     my ( $name, $indicator ) = ( $1, $2 );
     croak "parse_spec: \$spec parameter contains option '$name' multiple times, stopped"
       if exists $spec_as_hash->{ $name };
-    $spec_as_hash->{ $name } = $indicator
+    $spec_as_hash->{ $name } = $indicator;
+    ++$spec_length_got
   }
   my $offset = pos $spec;
   croak "parse_spec: \$spec parameter isn't a non-empty string of alphanumeric characters, stopped"
     unless defined $offset and $offset == length $spec;
+  croak "parse_spec: \$spec parameter specifies $spec_length_got options (expected: $spec_length_expected), stopped"
+    if defined $spec_length_expected and $spec_length_got != $spec_length_expected;
 
-  $spec_as_hash
+  undef
 }
 
 # https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02>
 sub getopts3 ( \@$\% ) {
   my ( $argv, $spec, $opts ) = @_;
 
-  my $spec_as_hash = parse_spec $spec;
+  my $spec_as_hash;
+  if ( 'HASH' eq ref $spec ) {
+    $spec_as_hash = $spec
+  } else {
+    parse_spec $spec, %$spec_as_hash;
+  }
   croak "getopts: \$opts parameter hash isn't empty, stopped"
     if %$opts;
 
@@ -135,17 +143,23 @@ sub getopts ( $\% ) {
 }
 
 sub processopts ( @ ) {
-  my $spec = do {
+  my $spec_as_array = do {
     use warnings FATAL => qw( misc uninitialized );
-    join '', keys %{ +{ @_ } };
+    [ keys %{ +{ @_ } } ];
   };
 
-  return FALSE unless getopts3 @ARGV, $spec, my %opts;
+  # Check each option specification individually (1)
+  my $spec_as_hash;
+  parse_spec $_, %$spec_as_hash, 1 for @$spec_as_array;
 
+  return FALSE unless getopts3 @ARGV, $spec_as_hash, my %opts;
+
+  # This ordered processing could be a feature
   for ( my $i = 0 ; $i < @_ ; $i += 2 ) {
     # If $_[ $i ] refers to a flag with no indicator, the split still returns
     # the empty string (not undef!) as the value for the indicator
     my ( $name, $indicator ) = split //, $_[ $i ];
+    # Callbacks are called in void context
     $_[ $i + 1 ]->( $opts{ $name }, $name, $indicator ) if exists $opts{ $name }
   }
 

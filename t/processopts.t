@@ -15,12 +15,16 @@ BEGIN {
 my $fail_cb = sub { fail "'$_[ 1 ]' callback shouldn't be called" };
 
 subtest 'Provoke exceptions' => sub {
-  plan tests => 1;
+  plan tests => 3;
 
   local @ARGV = qw( -a foo );
   like exception {
     processopts ':a:' => $fail_cb
-  }, qr/isn't a non-empty string of alphanumeric/, "Leading ':' character is not allowed"
+  }, qr/isn't a non-empty string of alphanumeric/, "Leading ':' character is not allowed";
+  is_deeply \@ARGV, [ qw( -a foo ) ], '@ARGV restored';
+
+  like exception { processopts 'a:b' => $fail_cb }, qr/specifies 2 options \(expected: 1\)/,
+    'Single option specification expected'
 };
 
 subtest 'Single option without option-argument (flag)' => sub {
