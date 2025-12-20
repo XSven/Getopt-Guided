@@ -7,7 +7,6 @@ package Getopt::Guided;
 
 $Getopt::Guided::VERSION = 'v2.0.1';
 
-use Carp           qw( croak );
 use File::Basename qw( basename );
 
 # Flag Indicator Character Class
@@ -21,13 +20,20 @@ sub FALSE () { !!0 }
 
 @Getopt::Guided::EXPORT_OK = qw( getopts getopts3 processopts );
 
+sub croakf ( $@ ) {
+  # Load Carp lazily
+  require Carp;
+  @_ = ( ( @_ == 1 ? shift : sprintf shift, @_ ) . ', stopped' );
+  goto &Carp::croak
+}
+
 sub import {
   my $module = shift;
 
   our @EXPORT_OK;
   my $target = caller;
   for my $function ( @_ ) {
-    croak "$module: '$function' is not exported, stopped"
+    croakf "%s: '%s' is not exported", $module, $function
       unless grep { $function eq $_ } @EXPORT_OK;
     no strict 'refs'; ## no critic ( ProhibitNoStrict )
     *{ "$target\::$function" } = $module->can( $function )
@@ -42,15 +48,15 @@ sub parse_spec ( $\%;$ ) {
   no warnings qw( uninitialized ); ## no critic ( ProhibitNoWarnings )
   while ( $spec =~ m/\G ( [[:alnum:]] ) ( ${ \( FICC ) } | ${ \( OAICC ) } | )/gcox ) {
     my ( $name, $indicator ) = ( $1, $2 );
-    croak "parse_spec: \$spec parameter contains option '$name' multiple times, stopped"
+    croakf "%s parameter contains option '%s' multiple times", '$spec', $name
       if exists $spec_as_hash->{ $name };
     $spec_as_hash->{ $name } = $indicator;
     ++$spec_length_got
   }
   my $offset = pos $spec;
-  croak "parse_spec: \$spec parameter isn't a non-empty string of alphanumeric characters, stopped"
+  croakf "%s parameter isn't a non-empty string of alphanumeric characters", '$spec'
     unless defined $offset and $offset == length $spec;
-  croak "parse_spec: \$spec parameter specifies $spec_length_got options (expected: $spec_length_expected), stopped"
+  croakf '%s parameter specifies %d options (expected: %d)', '$spec', $spec_length_got, $spec_length_expected
     if defined $spec_length_expected and $spec_length_got != $spec_length_expected;
 
   undef
@@ -66,7 +72,7 @@ sub getopts3 ( \@$\% ) {
   } else {
     parse_spec $spec, %$spec_as_hash
   }
-  croak "getopts: \$opts parameter hash isn't empty, stopped"
+  croakf "%s parameter isn't an empty hash", '%$opts'
     if %$opts;
 
   my @argv_backup = @$argv;
