@@ -64,7 +64,7 @@ sub getopts3 ( \@$\% ) {
   if ( 'HASH' eq ref $spec ) {
     $spec_as_hash = $spec
   } else {
-    parse_spec $spec, %$spec_as_hash;
+    parse_spec $spec, %$spec_as_hash
   }
   croak "getopts: \$opts parameter hash isn't empty, stopped"
     if %$opts;
@@ -144,8 +144,8 @@ sub getopts ( $\% ) {
 
 sub processopts ( @ ) {
   my $spec_as_array = do {
-    use warnings FATAL => qw( misc uninitialized );
-    [ keys %{ +{ @_ } } ];
+    my $i = 0;
+    [ grep { 0 == $i++ % 2 } @_ ]
   };
 
   # Check each option specification individually (1)

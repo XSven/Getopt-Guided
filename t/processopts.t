@@ -21,7 +21,7 @@ subtest 'Provoke exceptions' => sub {
   like exception {
     processopts ':a:' => $fail_cb
   }, qr/isn't a non-empty string of alphanumeric/, "Leading ':' character is not allowed";
-  is_deeply \@ARGV, [ qw( -a foo ) ], '@ARGV restored';
+  is_deeply \@ARGV, [ qw( -a foo ) ], '@ARGV not changed';
 
   like exception { processopts 'a:b' => $fail_cb }, qr/specifies 2 options \(expected: 1\)/,
     'Single option specification expected'
@@ -62,16 +62,20 @@ subtest 'Single option with option-argument' => sub {
 };
 
 subtest 'Option with option-argument and a flag' => sub {
-  plan tests => 5;
+  plan tests => 6;
 
+  # On purpose @ARGV doesn't contain flag
   local @ARGV = qw( -a bar );
   ok processopts(
     'a:' => sub {
-      my ( $argument, $name, $indicator ) = @_;
+      my $argument  = shift;
+      my $name      = shift;
+      my $indicator = shift;
 
       is $argument,  'bar', 'Check argument';
       is $name,      'a',   'Check name';
-      is $indicator, ':',   'Check indicator'
+      is $indicator, ':',   'Check indicator';
+      is @_,         0,     '@_ is empty'
     },
     'b' => $fail_cb
     ),
@@ -85,5 +89,5 @@ subtest 'Unknown option' => sub {
   local @ARGV = qw( -b -d bar );
   warning_like { ok !processopts( 'a:' => $fail_cb, 'b' => $fail_cb ), 'Failed' } qr/illegal option -- d/,
     'Check warning';
-  is_deeply \@ARGV, [ qw( -b -d bar ) ], '@ARGV restored'
+  is_deeply \@ARGV, [ qw( -b -d bar ) ], '@ARGV not changed'
 }
