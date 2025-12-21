@@ -44,21 +44,16 @@ subtest 'Single option without option-argument (flag)' => sub {
   is @ARGV, 0, '@ARGV is empty'
 };
 
-subtest 'Single option with option-argument' => sub {
+subtest 'Single option with option-argument; callback sets closure variables' => sub {
   plan tests => 5;
 
   local @ARGV = qw( -a foo );
-  ok processopts(
-    'a:' => sub {
-      my ( $argument, $name, $indicator ) = @_;
-
-      is $argument,  'foo', 'Check argument';
-      is $name,      'a',   'Check name';
-      is $indicator, ':',   'Check indicator'
-    }
-    ),
-    'Succeeded';
-  is @ARGV, 0, '@ARGV is empty'
+  my ( $argument, $name, $indicator );
+  ok processopts( 'a:' => sub { ( $argument, $name, $indicator ) = @_ } ), 'Succeeded';
+  is $argument,  'foo', 'Check argument';
+  is $name,      'a',   'Check name';
+  is $indicator, ':',   'Check indicator';
+  is @ARGV,      0,     '@ARGV is empty'
 };
 
 subtest 'Option with option-argument and a flag' => sub {

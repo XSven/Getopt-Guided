@@ -9,6 +9,8 @@ $Getopt::Guided::VERSION = 'v2.0.1';
 
 use File::Basename qw( basename );
 
+# End Of Options Delimiter
+sub EOOD () { '--' }
 # Flag Indicator Character Class
 sub FICC () { '[!+]' }
 # Option-Argument Indicator Character Class
@@ -81,7 +83,7 @@ sub getopts3 ( \@$\% ) {
   while ( @$argv and my ( $name, $rest ) = ( $argv->[ 0 ] =~ m/\A - (.) (.*)/ox ) ) {
     # Guideline 10
     shift @$argv, last
-      if $argv->[ 0 ] eq '--';
+      if $argv->[ 0 ] eq EOOD;
     @error = ( 'illegal option', $name ), last
       unless exists $spec_as_hash->{ $name }; ## no critic ( ProhibitNegativeExpressionsInUnlessAndUntilConditions )
 
