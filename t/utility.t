@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( plan subtest ) ], tests => 2;
-use Test::Script qw( script_compiles script_fails script_stderr_is script_stderr_like );
+use Test::More import => [ qw( plan subtest ) ], tests => 3;
+use Test::Script qw( script_compiles script_fails script_runs script_stderr_is script_stdout_is script_stderr_like );
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile );
@@ -25,4 +25,13 @@ subtest 'Utility is fine but called wrongly: unknown option' => sub {
   script_compiles $utility;
   script_fails [ $utility, '-g' ], { exit => 2 }, 'Check exit status';
   script_stderr_is basename( $utility ) . ": illegal option -- g\n", 'Check standard error output'
+};
+
+subtest 'Ask utility for its version information' => sub {
+  plan tests => 3;
+
+  my $utility = catfile( qw( t examples fine ) );
+  script_compiles $utility;
+  script_runs [ $utility, '-V' ], 'Check exit status';
+  script_stdout_is basename( $utility ) . " v6.6.6\n", 'Check standard output'
 }

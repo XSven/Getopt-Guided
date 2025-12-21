@@ -1,12 +1,19 @@
 use strict;
 use warnings;
 
-use Getopt::Guided qw( getopts3 );
+$main::VERSION = 'v6.6.6';
+
+use File::Basename qw( basename );
+use Getopt::Guided qw( processopts );
+
+sub print_version {
+  print STDOUT basename( $0 ) . ' ' . $main::VERSION, "\n"
+}
 
 sub run ( \@ ) {
-  my @argv = @{ $_[ 0 ] };
+  local @ARGV = @{ $_[ 0 ] };
 
-  return 2 unless getopts3 @argv, 'Vh', my %opts;
+  return 2 unless processopts V => \&print_version, h => sub { };
   0
 }
 
