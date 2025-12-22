@@ -35,6 +35,7 @@ subtest 'Validate $spec parameter' => sub {
 subtest 'Validate $opts parameter' => sub {
   plan tests => 1;
 
+  local @ARGV = ();
   my %opts = ( a => 'foo' );
   like exception { getopts 'a:b', %opts }, qr/\A\%\$opts parameter isn't an empty hash/,
     'Result %opts hash has to be empty'
