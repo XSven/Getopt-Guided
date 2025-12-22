@@ -7,8 +7,6 @@ package Getopt::Guided;
 
 $Getopt::Guided::VERSION = 'v2.0.1';
 
-use File::Basename qw( basename );
-
 # End Of Options Delimiter
 sub EOOD () { '--' }
 # Flag Indicator Character Class
@@ -20,12 +18,11 @@ sub TRUE () { !!1 }
 # Perl boolean false value
 sub FALSE () { !!0 }
 
-@Getopt::Guided::EXPORT_OK = qw( getopts getopts3 processopts );
+@Getopt::Guided::EXPORT_OK = qw( EOOD getopts getopts3 processopts );
 
 sub croakf ( $@ ) {
-  # Load Carp lazily
-  require Carp;
   @_ = ( ( @_ == 1 ? shift : sprintf shift, @_ ) . ', stopped' );
+  require Carp;
   goto &Carp::croak
 }
 
@@ -69,7 +66,7 @@ sub getopts3 ( \@$\% ) {
   my ( $argv, $spec, $opts ) = @_;
 
   my $spec_as_hash;
-  if ( 'HASH' eq ref $spec ) {
+  if ( ref $spec eq 'HASH' ) {
     $spec_as_hash = $spec
   } else {
     parse_spec $spec, %$spec_as_hash
@@ -138,7 +135,8 @@ sub getopts3 ( \@$\% ) {
     %$opts = ();
     # Prepare and print warning message:
     # Program name, type of error, and invalid option character
-    warn sprintf( "%s: %s -- %s\n", basename( $0 ), @error ) ## no critic ( RequireCarping )
+    require File::Basename;
+    warn sprintf( "%s: %s -- %s\n", File::Basename::basename( $0 ), @error ) ## no critic ( RequireCarping )
   }
 
   @error == 0
@@ -168,7 +166,9 @@ sub processopts ( @ ) {
     # the empty string (not undef!) as the value for the indicator
     my ( $name, $indicator ) = split //, $_[ $i ];
     # Callbacks are called in void context
-    $_[ $i + 1 ]->( $opts{ $name }, $name, $indicator ) if exists $opts{ $name }
+    if ( exists $opts{ $name } ) {
+      last if $_[ $i + 1 ]->( $opts{ $name }, $name, $indicator ) eq EOOD;
+    }
   }
 
   TRUE

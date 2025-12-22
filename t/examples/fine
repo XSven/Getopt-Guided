@@ -4,10 +4,11 @@ use warnings;
 $main::VERSION = 'v6.6.6';
 
 use File::Basename qw( basename );
-use Getopt::Guided qw( processopts );
+use Getopt::Guided qw( EOOD processopts );
 
 sub print_version {
-  print STDOUT basename( $0 ) . ' ' . $main::VERSION, "\n"
+  printf STDOUT "%s %s\n", basename( $0 ), $main::VERSION;
+  EOOD
 }
 
 sub run ( \@ ) {
