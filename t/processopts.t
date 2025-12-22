@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT fail is is_deeply like ok plan subtest use_ok ) ], tests => 8;
+use Test::More import => [ qw( BAIL_OUT fail is is_deeply like ok plan subtest use_ok ) ], tests => 9;
 use Test::Fatal qw( exception );
 use Test::Warn  qw( warning_like );
 
@@ -27,7 +27,7 @@ subtest 'Provoke exceptions' => sub {
     'Single option specification expected'
 };
 
-subtest 'Single option without option-argument (flag)' => sub {
+subtest 'Usual flag' => sub {
   plan tests => 5;
 
   local @ARGV = qw( -b );
@@ -44,7 +44,16 @@ subtest 'Single option without option-argument (flag)' => sub {
   is @ARGV, 0, '@ARGV is empty'
 };
 
-subtest 'Single option with option-argument; callback sets closure variables' => sub {
+subtest 'Common option; scalar reference instead of callback' => sub {
+  plan tests => 3;
+
+  local @ARGV = qw( -a baz );
+  ok processopts( 'a:' => \my $argument ), 'Succeeded';
+  is $argument, 'baz', 'Check argument';
+  is @ARGV,     0,     '@ARGV is empty'
+};
+
+subtest 'Common option; callback sets closure variables' => sub {
   plan tests => 5;
 
   local @ARGV = qw( -a foo );
@@ -56,7 +65,7 @@ subtest 'Single option with option-argument; callback sets closure variables' =>
   is @ARGV,      0,     '@ARGV is empty'
 };
 
-subtest 'Option with option-argument and a flag' => sub {
+subtest 'Common option and usual flag' => sub {
   plan tests => 6;
 
   # On purpose @ARGV doesn't contain flag
@@ -78,7 +87,7 @@ subtest 'Option with option-argument and a flag' => sub {
   is @ARGV, 0, '@ARGV is empty'
 };
 
-subtest 'Incrementable flag and list option' => sub {
+subtest 'List option and incrementable flag' => sub {
   plan tests => 4;
 
   local @ARGV = qw( -v -I lib -vv -I local/lib/perl5 );

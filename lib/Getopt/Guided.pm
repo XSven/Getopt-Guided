@@ -166,9 +166,19 @@ sub processopts3 ( \@@ ) {
     # If $_[ $i ] refers to a flag with no indicator, the split still returns
     # the empty string (not undef!) as the value for the indicator
     my ( $name, $indicator ) = split //, $_[ $i ];
-    # Callbacks are called in void context
     if ( exists $opts{ $name } ) {
-      last if $_[ $i + 1 ]->( $opts{ $name }, $name, $indicator ) eq EOOD;
+      my $value = delete $opts{ $name };
+      # TODO: $destination is borrowed from Getopt::Long. Find a better name
+      my $destination = $_[ $i + 1 ];
+      if ( ref $destination eq 'SCALAR' ) {
+        ${ $destination } = $value
+      } elsif ( ref $destination eq 'CODE' ) {
+        # Callbacks are called in scalar context
+        last if $destination->( $value, $name, $indicator ) eq EOOD;
+      } else {
+        # FIXME:
+        croakf 'Unsupported destination type';
+      }
     }
   }
 
