@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT fail is is_deeply like ok plan subtest use_ok ) ], tests => 6;
+use Test::More import => [ qw( BAIL_OUT fail is is_deeply like ok plan subtest use_ok ) ], tests => 8;
 use Test::Fatal qw( exception );
 use Test::Warn  qw( warning_like );
 
@@ -9,7 +9,7 @@ my $module;
 
 BEGIN {
   $module = 'Getopt::Guided';
-  use_ok $module, qw( processopts ) or BAIL_OUT "Cannot loade module '$module'!"
+  use_ok $module, qw( EOOD processopts ) or BAIL_OUT "Cannot loade module '$module'!"
 }
 
 my $fail_cb = sub { fail "'$_[ 1 ]' callback shouldn't be called" };
@@ -78,6 +78,18 @@ subtest 'Option with option-argument and a flag' => sub {
   is @ARGV, 0, '@ARGV is empty'
 };
 
+subtest 'Incrementable flag and list option' => sub {
+  plan tests => 4;
+
+  local @ARGV = qw( -v -I lib -vv -I local/lib/perl5 );
+  ok processopts(
+    'v+' => sub { is $_[ 0 ],        3,                             'Check argument' },
+    'I,' => sub { is_deeply $_[ 0 ], [ qw( lib local/lib/perl5 ) ], 'Check argument' }
+    ),
+    'Succeeded';
+  is @ARGV, 0, '@ARGV is empty'
+};
+
 subtest 'Unknown option' => sub {
   plan tests => 3;
 
@@ -85,4 +97,14 @@ subtest 'Unknown option' => sub {
   warning_like { ok !processopts( 'a:' => $fail_cb, 'b' => $fail_cb ), 'Failed' } qr/illegal option -- d/,
     'Check warning';
   is_deeply \@ARGV, [ qw( -b -d bar ) ], '@ARGV not changed'
+};
+
+subtest 'Semantic priority' => sub {
+  plan tests => 2;
+
+  # -h comes first on purpose
+  local @ARGV = qw( -h -V );
+  # Best pratice: -V should have higher precedence (semantic priority) than -h
+  ok processopts( 'V' => sub { EOOD }, 'h' => $fail_cb ), 'Succeeded';
+  is @ARGV, 0, '@ARGV is empty'
 }
