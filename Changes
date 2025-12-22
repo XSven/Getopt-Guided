@@ -2,7 +2,7 @@ Release history for Getopt-Guided
 
 2.1.0    Mon Dec 22 05:19:38 PM CET 2025
          - Use end of options delimiter to finish options processing
-         - Introduce new processopts() function
+         - Introduce new processopts() and processopts3() functions
          - Load Carp and File::Basename lazily
          - Tidy source code
          - Rewrite documentation

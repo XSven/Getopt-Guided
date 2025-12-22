@@ -18,7 +18,7 @@ sub TRUE () { !!1 }
 # Perl boolean false value
 sub FALSE () { !!0 }
 
-@Getopt::Guided::EXPORT_OK = qw( EOOD getopts getopts3 processopts );
+@Getopt::Guided::EXPORT_OK = qw( EOOD getopts3 getopts processopts3 processopts );
 
 sub croakf ( $@ ) {
   @_ = ( ( @_ == 1 ? shift : sprintf shift, @_ ) . ', stopped' );
@@ -148,7 +148,8 @@ sub getopts ( $\% ) {
   getopts3 @ARGV, $spec, %$opts
 }
 
-sub processopts ( @ ) {
+sub processopts3 ( \@@ ) {
+  my $argv          = shift;
   my $spec_as_array = do {
     my $i = 0;
     [ grep { 0 == $i++ % 2 } @_ ]
@@ -158,7 +159,7 @@ sub processopts ( @ ) {
   my $spec_as_hash;
   parse_spec $_, %$spec_as_hash, 1 for @$spec_as_array;
 
-  return FALSE unless getopts3 @ARGV, $spec_as_hash, my %opts;
+  return FALSE unless getopts3 @$argv, $spec_as_hash, my %opts;
 
   # This ordered processing could be a feature
   for ( my $i = 0 ; $i < @_ ; $i += 2 ) {
@@ -172,6 +173,10 @@ sub processopts ( @ ) {
   }
 
   TRUE
+}
+
+sub processopts ( @ ) {
+  processopts3 @ARGV, @_;
 }
 
 1
