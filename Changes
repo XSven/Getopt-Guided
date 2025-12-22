@@ -1,10 +1,11 @@
 Release history for Getopt-Guided
 
-2.0.1    Sun Dec 21 06:48:57 PM CET 2025
-         - Tidy source code
-         - Load Carp and File::Basename lazily
+2.1.0    Mon Dec 22 05:19:38 PM CET 2025
          - Use end of options delimiter to finish options processing
          - Introduce new processopts() function
+         - Load Carp and File::Basename lazily
+         - Tidy source code
+         - Rewrite documentation
 
 2.0.0    Tue Dec 16 09:04:28 AM CET 2025
          - BREAKING CHANGE: Common flags do not increment with repetition

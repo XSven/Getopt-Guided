@@ -20,28 +20,49 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
   # %opts == ( a => 'av2', c => !!1, d => [ 'dv1', 'dv2', '--' ], v => 3 )
   # @ARGV == ( 'v1', 'v2' )
 
-
-=head1 ABOUT OPTIONS
+=head1 OPTIONS
 
 An option (command-line option) has a name that is a single alphanumeric
 (C<[[:alnum:]]>) character. It has a delimiter (prefix delimiter) that is
 a hyphen (C<->) character.
 
-Some options require an argument (option-argument). If an option requires an
-argument, an indicator (option-argument indicator) character is attached to
-its name. A common option has a colon (C<:>) indicator. A list option has
-a comma (C<,>) indicator. The POSIX standard knows only common options.
+=head2 OPTIONS FOLLOWED BY AN ARGUMENT
 
-An option that requires no argument is called a flag.  A flag can optionally
-have an indicator (flag indicator) character. A negatable flag has an
-exclamation mark (C<!>) indicator. An incrementable flag has a plus sign
-(C<+>) indicator. The POSIX standard doesn't know flag indicators.
+Some options require an argument (option-argument). If an option requires
+an argument, an indicator (option-argument indicator) character is attached
+to its name. A "common option" has a colon (C<:>) indicator. A "list option"
+has a comma (C<,>) indicator. The POSIX standard knows only common options.
+
+If a common option is repeated, its arguments overwrite each other and the
+last argument wins.
+
+If a list option is repeated, its arguments are pushed onto a list.
+
+=head2 FLAGS
+
+An option that requires no argument is called a flag (or switch).  A flag can
+optionally have an indicator (flag indicator) character. A "negatable flag"
+has an exclamation mark (C<!>) indicator. An "incrementable flag" has a plus
+sign (C<+>) indicator. The POSIX standard doesn't know flag indicators.
+
+The appearance of a flag on the command line sets its value (initial value)
+to true (C<!!1>).
+
+If a flag with no indicator is repeated, its initial value will not change.
+
+If a negatable flag is repeated, its initial value will be logically negated
+on each occurrence.
+
+If an incrementable flag is repeated, its initial value (its IV value)
+will be incremented by one on each occurrence.  Use case: An incrementable
+verbosity level can be represented by a C<v+> flag specification.
 
 =head1 DESCRIPTION
 
-This module reimplements the C<getopts()> function of the L<Getopts::Std>
+This module reimplements the C<getopts( $;$ )> function of the L<Getopts::Std>
 core module.  The new implementation supports only the two-parameter form
-of C<getopts()> where the second parameter is not a hash reference but a hash.
+of C<getopts( $\% )> where the second parameter is not a hash reference but
+a hash.
 
 The first parameter is the "options specification" C<$spec>. It is a
 non-empty string that contains a joined list of options (C<E<lt>nameE<gt>
@@ -50,7 +71,8 @@ non-empty string that contains a joined list of options (C<E<lt>nameE<gt>
 The second parameter is the "name-value map" C<%opts>. It is an empty hash
 (passed by reference) that stores the C<getopts()> processing result. Each
 hash key refers to an option name and the corresponding hash value refers
-to the option-argument value (or C<!!1> if it is a flag).
+to the option-argument value (or the flag value). The hash value of a list
+option is an array reference.
 
 This module exports the C<getopts()> function on request.
 
@@ -81,33 +103,16 @@ value is provided for an option that requires an option-argument.
 If any of the processing errors occurs, C<getopts()> restores C<@ARGV>
 before it warns and returns false.
 
-As of version 1.1.0 this module provides the additional function C<getopts3()>.
-This function has a 3rd leading parameter. The parameter is an array (passed
-by reference) of command-line argument values. It replaces the implicit use
-of C<@ARGV>. This module exports the C<getopts3()> function on request too.
-
-=head1 REPEATING OPTIONS
-
-If a flag with no indicator is repeated, its initial C<%opts> hash value
-C<!!1> will not change.
-
-If a negatable flag is repeated, its initial C<%opts> hash value C<!!1>
-will be logically negated on each occurrence.
-
-If an incrementable flag is repeated, its initial C<%opts> hash value C<1>
-will be incremented by one on each occurrence.  For example, this is useful
-for incrementing a verbosity level represented by the C<v+> flag.
-
-If a common option is repeated, the option-arguments overwrite each other
-and the last argument wins that means it is the C<%opts> hash value.
-
-If a list option is repeated, the option-arguments are pushed to an array. A
-reference to that array is the C<%opts> hash value.
+As of version 1.1.0 this module provides the additional function C<getopts3(
+\@$\% )>.  This function has a 3rd "leading" parameter. The parameter is an
+array (passed by reference) of command-line argument values. It replaces the
+implicit use of C<@ARGV>. This module exports the C<getopts3()> function on
+request too.
 
 =head1 CAVEAT
 
-Even if you are currently using the two-parameter form of the C<getopts()>
-function of C<Getopts::Std>, the new implementation isn't a drop in
+Even if you are currently using the two-parameter form of the C<getopts(
+$\% )> function of C<Getopts::Std>, the new implementation isn't a drop in
 replacement. The most crucial change is the type of the second parameter. The
 second parameter is not a hash reference anymore but a hash.
 
