@@ -5,7 +5,7 @@ use warnings;
 
 package Getopt::Guided;
 
-$Getopt::Guided::VERSION = 'v2.0.1';
+$Getopt::Guided::VERSION = 'v2.1.0';
 
 # End Of Options Delimiter
 sub EOOD () { '--' }
@@ -176,8 +176,7 @@ sub processopts3 ( \@@ ) {
         # Callbacks are called in scalar context
         last if $destination->( $value, $name, $indicator ) eq EOOD;
       } else {
-        # FIXME:
-        croakf 'Unsupported destination type';
+        croakf "'%s' is an unsupported destination reference type", ref $destination;
       }
     }
   }

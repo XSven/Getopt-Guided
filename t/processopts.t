@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT fail is is_deeply like ok plan subtest use_ok ) ], tests => 9;
+use Test::More import => [ qw( BAIL_OUT fail is is_deeply like ok plan subtest use_ok ) ], tests => 10;
 use Test::Fatal qw( exception );
 use Test::Warn  qw( warning_like );
 
@@ -15,70 +15,73 @@ BEGIN {
 my $fail_cb = sub { fail "'$_[ 1 ]' callback shouldn't be called" };
 
 subtest 'Provoke exceptions' => sub {
-  plan tests => 3;
+  plan tests => 4;
 
-  local @ARGV = qw( -a foo );
+  local @ARGV = qw( -I blib/lib -a foo -I blib/arch );
   like exception {
     processopts ':a:' => $fail_cb
   }, qr/isn't a non-empty string of alphanumeric/, "Leading ':' character is not allowed";
-  is_deeply \@ARGV, [ qw( -a foo ) ], '@ARGV not changed';
+  is_deeply \@ARGV, [ qw( -I blib/lib -a foo -I blib/arch ) ], '@ARGV not changed';
 
   like exception { processopts 'a:b' => $fail_cb }, qr/specifies 2 options \(expected: 1\)/,
-    'Single option specification expected'
+    'Single option specification expected';
+
+  like exception { processopts 'a:' => \my $value, 'I,' => \my @libs },
+    qr/\A'ARRAY' is an unsupported destination reference type/, 'Unknown destination reference type'
 };
 
-subtest 'Usual flag' => sub {
+subtest 'Callback destination: usual flag' => sub {
   plan tests => 5;
 
   local @ARGV = qw( -b );
   ok processopts(
     'b' => sub {
-      my ( $argument, $name, $indicator ) = @_;
+      my ( $value, $name, $indicator ) = @_;
 
-      is $argument,  1,   'Check argument';
-      is $name,      'b', 'Check name';
-      is $indicator, '',  'Check indicator'
+      is $value,     1,   'Check 0th callback argument (value)';
+      is $name,      'b', 'Check 1st callback argument (name)';
+      is $indicator, '',  'Check 2nd callback argument (indicator)'
     }
     ),
     'Succeeded';
   is @ARGV, 0, '@ARGV is empty'
 };
 
-subtest 'Common option; scalar reference instead of callback' => sub {
-  plan tests => 3;
-
-  local @ARGV = qw( -a baz );
-  ok processopts( 'a:' => \my $argument ), 'Succeeded';
-  is $argument, 'baz', 'Check argument';
-  is @ARGV,     0,     '@ARGV is empty'
-};
-
-subtest 'Common option; callback sets closure variables' => sub {
+subtest 'Callback destination: common option' => sub {
   plan tests => 5;
 
   local @ARGV = qw( -a foo );
-  my ( $argument, $name, $indicator );
-  ok processopts( 'a:' => sub { ( $argument, $name, $indicator ) = @_ } ), 'Succeeded';
-  is $argument,  'foo', 'Check argument';
-  is $name,      'a',   'Check name';
-  is $indicator, ':',   'Check indicator';
+  my ( $value, $name, $indicator );
+  ok processopts( 'a:' => sub { ( $value, $name, $indicator ) = @_ } ), 'Succeeded';
+  is $value,     'foo', 'Check 0th callback argument assigned to closure variable (value)';
+  is $name,      'a',   'Check 1st callback argument assigned to closure variable (name)';
+  is $indicator, ':',   'Check 2nd callback argument assigned to closure variable (indicator)';
   is @ARGV,      0,     '@ARGV is empty'
 };
 
-subtest 'Common option and usual flag' => sub {
+subtest 'Scalar reference destination: common option' => sub {
+  plan tests => 3;
+
+  local @ARGV = qw( -a baz );
+  ok processopts( 'a:' => \my $value ), 'Succeeded';
+  is $value, 'baz', 'Check common option value';
+  is @ARGV,  0,     '@ARGV is empty'
+};
+
+subtest 'Callback destination: common option and usual flag' => sub {
   plan tests => 6;
 
   # On purpose @ARGV doesn't contain flag
   local @ARGV = qw( -a bar );
   ok processopts(
     'a:' => sub {
-      my $argument  = shift;
+      my $value     = shift;
       my $name      = shift;
       my $indicator = shift;
 
-      is $argument,  'bar', 'Check argument';
-      is $name,      'a',   'Check name';
-      is $indicator, ':',   'Check indicator';
+      is $value,     'bar', 'Check 0th shifted callback argument (value)';
+      is $name,      'a',   'Check 1st shifted callback argument (name)';
+      is $indicator, ':',   'Check 2nd shifted callback argument (indicator)';
       is @_,         0,     '@_ is empty'
     },
     'b' => $fail_cb
@@ -87,15 +90,25 @@ subtest 'Common option and usual flag' => sub {
   is @ARGV, 0, '@ARGV is empty'
 };
 
-subtest 'List option and incrementable flag' => sub {
+subtest 'Callback destination: list option and incrementable flag' => sub {
   plan tests => 4;
 
   local @ARGV = qw( -v -I lib -vv -I local/lib/perl5 );
   ok processopts(
-    'v+' => sub { is $_[ 0 ],        3,                             'Check argument' },
-    'I,' => sub { is_deeply $_[ 0 ], [ qw( lib local/lib/perl5 ) ], 'Check argument' }
+    'v+' => sub { is $_[ 0 ],        3,                             'Check 0th callback argument' },
+    'I,' => sub { is_deeply $_[ 0 ], [ qw( lib local/lib/perl5 ) ], 'Check 0th callback argument' }
     ),
     'Succeeded';
+  is @ARGV, 0, '@ARGV is empty'
+};
+
+subtest 'Scalar reference destination: list option and incrementable flag' => sub {
+  plan tests => 4;
+
+  local @ARGV = qw( -v -I lib -vv -I local/lib/perl5 );
+  ok processopts( 'v+' => \my $verbosity, 'I,' => \my $libs ), 'Succeeded';
+  is $verbosity, 3, 'Check incrementable flag value';
+  is_deeply $libs, [ qw( lib local/lib/perl5 ) ], 'Check list option value';
   is @ARGV, 0, '@ARGV is empty'
 };
 
