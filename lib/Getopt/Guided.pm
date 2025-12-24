@@ -142,18 +142,11 @@ sub getopts3 ( \@$\% ) {
   @error == 0
 }
 
-sub getopts ( $\% ) {
-  my ( $spec, $opts ) = @_;
-
-  getopts3 @ARGV, $spec, %$opts
-}
+sub getopts ( $\% ) { my ( $spec, $opts ) = @_; getopts3 @ARGV, $spec, %$opts }
 
 sub processopts3 ( \@@ ) {
   my $argv          = shift;
-  my $spec_as_array = do {
-    my $i = 0;
-    [ grep { 0 == $i++ % 2 } @_ ]
-  };
+  my $spec_as_array = do { my $t = 0; [ grep $t ^= 1, @_ ] }; ## no critic ( RequireBlockGrep )
 
   # Check each option specification individually (1)
   my $spec_as_hash;
@@ -167,16 +160,18 @@ sub processopts3 ( \@@ ) {
     # the empty string (not undef!) as the value for the indicator
     my ( $name, $indicator ) = split //, $_[ $i ];
     if ( exists $opts{ $name } ) {
-      my $value = delete $opts{ $name };
-      # TODO: $destination is borrowed from Getopt::Long. Find a better name
-      my $destination = $_[ $i + 1 ];
-      if ( ref $destination eq 'SCALAR' ) {
-        ${ $destination } = $value
-      } elsif ( ref $destination eq 'CODE' ) {
+      my $value         = delete $opts{ $name };
+      my $dest          = $_[ $i + 1 ];
+      my $dest_ref_type = ref $dest;
+      if ( $dest_ref_type eq 'SCALAR' ) {
+        ${ $dest } = $value
+      } elsif ( $dest_ref_type eq 'ARRAY' and $indicator eq ',' ) {
+        @{ $dest } = @$value
+      } elsif ( $dest_ref_type eq 'CODE' ) {
         # Callbacks are called in scalar context
-        last if $destination->( $value, $name, $indicator ) eq EOOD;
+        last if $dest->( $value, $name, $indicator ) eq EOOD
       } else {
-        croakf "'%s' is an unsupported destination reference type", ref $destination;
+        croakf "'%s' is an unsupported destination reference type for the '%s' indicator", $dest_ref_type, $indicator
       }
     }
   }
@@ -184,8 +179,6 @@ sub processopts3 ( \@@ ) {
   TRUE
 }
 
-sub processopts ( @ ) {
-  processopts3 @ARGV, @_;
-}
+sub processopts ( @ ) { processopts3 @ARGV, @_ }
 
 1

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT fail is is_deeply like ok plan subtest use_ok ) ], tests => 10;
+use Test::More import => [ qw( BAIL_OUT fail is is_deeply like ok plan subtest use_ok ) ], tests => 11;
 use Test::Fatal qw( exception );
 use Test::Warn  qw( warning_like );
 
@@ -26,8 +26,10 @@ subtest 'Provoke exceptions' => sub {
   like exception { processopts 'a:b' => $fail_cb }, qr/specifies 2 options \(expected: 1\)/,
     'Single option specification expected';
 
-  like exception { processopts 'a:' => \my $value, 'I,' => \my @libs },
-    qr/\A'ARRAY' is an unsupported destination reference type/, 'Unknown destination reference type'
+  like exception {
+    processopts 'a:' => \my @value, 'I,' => sub { }
+  }, qr/\A'ARRAY' is an unsupported destination reference type for the ':' indicator/, ## no critic ( ProhibitComplexRegexes )
+    'Unknown destination reference type'
 };
 
 subtest 'Callback destination: usual flag' => sub {
@@ -109,6 +111,16 @@ subtest 'Scalar reference destination: list option and incrementable flag' => su
   ok processopts( 'v+' => \my $verbosity, 'I,' => \my $libs ), 'Succeeded';
   is $verbosity, 3, 'Check incrementable flag value';
   is_deeply $libs, [ qw( lib local/lib/perl5 ) ], 'Check list option value';
+  is @ARGV, 0, '@ARGV is empty'
+};
+
+subtest 'Array and scalar reference destination: list option and incrementable flag' => sub {
+  plan tests => 4;
+
+  local @ARGV = qw( -v -I lib -vv -I local/lib/perl5 );
+  ok processopts( 'v+' => \my $verbosity, 'I,' => \my @libs ), 'Succeeded';
+  is $verbosity, 3, 'Check incrementable flag value';
+  is_deeply \@libs, [ qw( lib local/lib/perl5 ) ], 'Check list option value';
   is @ARGV, 0, '@ARGV is empty'
 };
 
