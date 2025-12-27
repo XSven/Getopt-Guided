@@ -24,7 +24,7 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
 
 An option (command-line option) has a name that is a single alphanumeric
 (C<[[:alnum:]]>) character. It has a delimiter (prefix delimiter) that is
-a hyphen (C<->) character.
+a hyphen-minus (C<->) character.
 
 =head2 OPTIONS FOLLOWED BY AN ARGUMENT
 
@@ -32,6 +32,8 @@ Some options require an argument (option-argument). If an option requires
 an argument, an indicator (option-argument indicator) character is attached
 to its name. A "common option" has a colon (C<:>) indicator. A "list option"
 has a comma (C<,>) indicator. The POSIX standard knows only common options.
+Although the POSIX standard allows common options with an optional argument,
+this implementation doesn't support that.
 
 If a common option is repeated, its arguments overwrite each other and the
 last argument wins.
