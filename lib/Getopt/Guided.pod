@@ -28,12 +28,12 @@ a hyphen-minus (C<->) character.
 
 =head2 OPTIONS FOLLOWED BY AN ARGUMENT
 
-Some options require an argument (option-argument). If an option requires
-an argument, an indicator (option-argument indicator) character is attached
-to its name. A "common option" has a colon (C<:>) indicator. A "list option"
-has a comma (C<,>) indicator. The POSIX standard knows only common options.
-Although the POSIX standard allows common options with an optional argument,
-this implementation doesn't support that.
+Some options require an argument (option-argument). If an option has a
+mandatory argument, an indicator (option-argument indicator) character is
+attached to its name. A "common option" has a colon (C<:>) indicator. A
+"list option" has a comma (C<,>) indicator. The POSIX standard knows only
+common options.  Although the POSIX standard allows common options with an
+optional argument, this implementation doesn't support that.
 
 If a common option is repeated, its arguments overwrite each other and the
 last argument wins.
@@ -100,7 +100,7 @@ option with argument isn't last one in group
 =back
 
 The second processing error occurs if either no argument or the C<undef>
-value is provided for an option that requires an option-argument.
+value is provided for an option that has to have a mandatory argument.
 
 If any of the processing errors occurs, C<getopts()> restores C<@ARGV>
 before it warns and returns false.
