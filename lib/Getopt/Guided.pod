@@ -20,6 +20,27 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
   # %opts == ( a => 'av2', c => !!1, d => [ 'dv1', 'dv2', '--' ], v => 3 )
   # @ARGV == ( 'v1', 'v2' )
 
+=head1 DESCRIPTION
+
+The
+L<getopts|https://pubs.opengroup.org/onlinepubs/9799919799/utilities/getopts.html>
+POSIX utility retrieves options and option-arguments from a
+list of command-line arguments. It supports the L<POSIX utility syntax
+guidelines|https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html#tag_12_02>
+3 to 10, inclusive.
+
+The C<getopts( $;$ )> function of the L<Getopts::Std> core module provides
+a rudimentary implementation of this utility.  This module exposes a new
+implementation through the C<getopts( $\%;\@ )> function. The primary
+implementation differences are
+
+                         | Getopt::Std impl | Getopt::Guided impl
+  -----------------------+------------------+----------------------------
+  exported               | by default       | on request
+  2nd parameter          | hash reference   | hash (passed by reference)
+  optional 3rd parameter | none             | array (passed by reference), which
+                         |                  | defaults to @ARGV
+
 =head1 COMMAND-LINE ARGUMENTS
 
 A list of command-line arguments consists of options, option-arguments, and
@@ -70,22 +91,11 @@ verbosity level can be represented by a C<v+> flag specification.
 
 =head1 DESCRIPTION
 
-This module reimplements the C<getopts( $;$ )> function of the L<Getopts::Std>
-core module.  The new implementation supports only the two-parameter form
-of C<getopts( $\% )> where the second parameter is not a hash reference but
-a hash.
-
-The first parameter is the "options specification" C<$spec>. It is a
-non-empty string that contains a joined list of options (C<E<lt>nameE<gt>
-[ E<lt>indicatorE<gt> ]>).
-
 The second parameter is the "name-value map" C<%opts>. It is an empty hash
 (passed by reference) that stores the C<getopts()> processing result. Each
 hash key refers to an option name and the corresponding hash value refers
 to the option-argument value (or the flag value). The hash value of a list
 option is an array reference.
-
-This module exports the C<getopts()> function on request.
 
 The new implementation follows the L<POSIX utility syntax
 guidelines|https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html#tag_12_02>
@@ -134,10 +144,6 @@ on request too.
 =head1 SEE ALSO
 
 =over 2
-
-=item *
-
-L<getopts|https://pubs.opengroup.org/onlinepubs/9799919799/utilities/getopts.html>
 
 =item *
 
