@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is is_deeply like ok plan subtest use_ok ) ], tests => 20;
+use Test::More import => [ qw( BAIL_OUT is is_deeply like ok plan subtest use_ok ) ], tests => 22;
 use Test::Fatal qw( exception lives_ok );
 use Test::Warn  qw( warning_like );
 
@@ -41,7 +41,7 @@ subtest 'Validate $opts parameter' => sub {
     'Result %opts hash has to be empty'
 };
 
-subtest 'Single option without option-argument (flag)' => sub {
+subtest 'Usual flag' => sub {
   plan tests => 3;
 
   local @ARGV = qw( -b );
@@ -50,10 +50,19 @@ subtest 'Single option without option-argument (flag)' => sub {
   is @ARGV, 0, '@ARGV is empty'
 };
 
-subtest 'Single option with option-argument' => sub {
+subtest 'Common option: Option and option-argument are separate' => sub {
   plan tests => 3;
 
   local @ARGV = qw( -a foo );
+  ok getopts( 'a:', my %got_opts ), 'Succeeded';
+  is_deeply \%got_opts, { a => 'foo' }, 'Option has option-argument';
+  is @ARGV, 0, '@ARGV is empty'
+};
+
+subtest 'Common option: Option and option-argument in same argument string' => sub {
+  plan tests => 3;
+
+  local @ARGV = qw( -afoo );
   ok getopts( 'a:', my %got_opts ), 'Succeeded';
   is_deeply \%got_opts, { a => 'foo' }, 'Option has option-argument';
   is @ARGV, 0, '@ARGV is empty'
@@ -79,7 +88,7 @@ subtest 'Default for option with option-argument' => sub {
   is @ARGV, 0, '@ARGV is empty'
 };
 
-subtest 'Grouping: Flag followed by single option with option-argument' => sub {
+subtest 'Grouping: Usual flag followed by common option' => sub {
   plan tests => 3;
 
   local @ARGV = qw( -ba foo );
@@ -88,15 +97,22 @@ subtest 'Grouping: Flag followed by single option with option-argument' => sub {
   is @ARGV, 0, '@ARGV is empty'
 };
 
-subtest 'Disallowed grouping: Single option with option-argument in the middle' => sub {
-  plan tests => 4;
+subtest 'Grouping: Usual flag followed by common option' => sub {
+  plan tests => 3;
+
+  local @ARGV = qw( -bafoo );
+  ok getopts( 'a:b', my %got_opts ), 'Succeeded';
+  is_deeply \%got_opts, { a => 'foo', b => 1 }, 'Options properly set';
+  is @ARGV, 0, '@ARGV is empty'
+};
+
+subtest 'Grouping: Common option in the middle' => sub {
+  plan tests => 3;
 
   local @ARGV = qw( -cab foo );
-  my %got_opts;
-  warning_like { ok !getopts( 'a:bc', %got_opts ), 'Failed' } qr/option with argument isn't last one in group -- a/,
-    'Check warning';
-  is_deeply \%got_opts, {}, '%got_opts is empty';
-  is_deeply \@ARGV, [ qw( -cab foo ) ], '@ARGV restored'
+  ok getopts( 'a:bc', my %got_opts ), 'Succeeded';
+  is_deeply \%got_opts, { a => 'b', c => 1 }, 'Options properly set';
+  is_deeply \@ARGV, [ qw( foo ) ], '@ARGV restored'
 };
 
 subtest 'End of options delimiter' => sub {

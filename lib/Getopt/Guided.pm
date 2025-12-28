@@ -74,6 +74,7 @@ sub getopts ( $\%;\@ ) {
 
   my @argv_backup = @$argv;
   my @error;
+  my $grouped = FALSE;
   # Guideline 4, Guideline 9
   while ( @$argv and my ( $name, $rest ) = ( $argv->[ 0 ] =~ m/\A - (.) (.*)/ox ) ) {
     # Guideline 10
@@ -85,17 +86,21 @@ sub getopts ( $\%;\@ ) {
     my $indicator = $spec_as_hash->{ $name };
     if ( $indicator =~ m/\A ${ \( OAICC ) } \z/ox ) {
       # Case: Option has an option-argument
-      # Guideline 5
-      @error = ( "option with argument isn't last one in group", $name ), last
-        unless $rest eq '';
       # Shift delimeted option name
       shift @$argv;
-      # Guideline 7
-      @error = ( 'option requires an argument', $name ), last
-        unless @$argv;
-      # Guideline 6, Guideline 8
-      @error = ( 'option requires an argument', $name ), last
-        unless defined( my $value = shift @$argv );
+      # Extract option-argument value
+      my $value;
+      if ( $rest ne '' ) {
+        $value = $rest;
+      } else {
+        # Guideline 7
+        @error = ( 'option requires an argument', $name ), last
+          unless @$argv;
+        # Guideline 6, Guideline 8
+        @error = ( 'option requires an argument', $name ), last
+          unless defined( $value = shift @$argv );
+      }
+      # Store option-argument value
       if ( $indicator eq ':' ) {
         # Standard behaviour: Overwrite option-argument
         $opts->{ $name } = $value
@@ -116,12 +121,14 @@ sub getopts ( $\%;\@ ) {
         # Increment
         ++$opts->{ $name }
       }
+      # Guideline 5
       if ( $rest eq '' ) {
         # Shift delimeted option name
-        shift @$argv
+        shift @$argv;
+        $grouped = FALSE
       } else {
-        # Guideline 5
-        $argv->[ 0 ] = "-$rest" ## no critic ( RequireLocalizedPunctuationVars )
+        $argv->[ 0 ] = "-$rest"; ## no critic ( RequireLocalizedPunctuationVars )
+        $grouped = TRUE
       }
     }
 

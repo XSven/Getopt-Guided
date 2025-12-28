@@ -93,10 +93,6 @@ illegal option
 
 option requires an argument
 
-=item 3.
-
-option with argument isn't last one in group
-
 =back
 
 The second processing error occurs if either no argument or the C<undef>
