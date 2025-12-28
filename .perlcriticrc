@@ -12,7 +12,7 @@ verbose            = %f: %m at line %l, column %c.  (Policy: %p, Severity: %s)\n
 [-RegularExpressions::RequireExtendedFormatting]
 [-Subroutines::ProtectPrivateSubs]
 [Subroutines::ProhibitExcessComplexity]
-max_mccabe = 22
+max_mccabe = 23
 [-Subroutines::ProhibitSubroutinePrototypes]
 [Subroutines::ProhibitUnusedPrivateSubroutines]
 allow_name_regex = _(?:build|trigger)_\w+

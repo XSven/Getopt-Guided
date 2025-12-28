@@ -20,32 +20,41 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
   # %opts == ( a => 'av2', c => !!1, d => [ 'dv1', 'dv2', '--' ], v => 3 )
   # @ARGV == ( 'v1', 'v2' )
 
-=head1 OPTIONS
+=head1 COMMAND-LINE ARGUMENTS
 
-An option (command-line option) has a name that is a single alphanumeric
-(C<[[:alnum:]]>) character. It has a delimiter (prefix delimiter) that is
-a hyphen-minus (C<->) character.
+A list of command-line arguments consists of options, option-arguments, and
+operands.  The arguments that consist of hyphen-minus (C<->) characters and
+single alphanumeric (C<[[:alnum:]]>) characters, are known as options. Certain
+options are followed by an option-argument.  The arguments following the
+last options and option-arguments are named operands.
 
-=head2 OPTIONS FOLLOWED BY AN ARGUMENT
+In Perl the array C<@ARGV> contains the command-line arguments.
 
-Some options require an argument (option-argument). If an option has a
-mandatory argument, an indicator (option-argument indicator) character is
-attached to its name. A "common option" has a colon (C<:>) indicator. A
-"list option" has a comma (C<,>) indicator. The POSIX standard knows only
-common options.  Although the POSIX standard allows common options with an
-optional argument, this implementation doesn't support that.
+=head1 OPTIONS SPECIFICATION
+
+The options specification C<$spec> is the first parameter of the C<getopts()>
+function.  It is a non-empty string containing the option names (the single
+alphanumeric characters) recognized by the C<getopts()> function.
+
+If an option name is followed by a colon (C<:>) character or a comma (C<,>)
+character, the option should have an option-argument which either shall be
+supplied as a separate argument (C<( '-a', 'foo' )>) or shall be part of the
+same argument string as the option name (C<( '-afoo' )>).  We call an option
+whose option name is followed by a colon (comma) option-argument indicator a
+"common option" ("list option").  The POSIX standard knows only common options.
+
+An option that does not require an option-argument is called a flag. The flag
+name can optionally be followed by an exclamation mark (C<!>) character or
+a plus sign (C<+>) character. We call a flag whose flag name is followed by
+an exclamation mark (plus sign) flag-type indicator a "negatable flag" (an
+"incrementable flag"). The POSIX standard doesn't know flag-type indicators.
+
+=head1 PROCESSING
 
 If a common option is repeated, its arguments overwrite each other and the
 last argument wins.
 
 If a list option is repeated, its arguments are pushed onto a list.
-
-=head2 FLAGS
-
-An option that requires no argument is called a flag (or switch).  A flag can
-optionally have an indicator (flag indicator) character. A "negatable flag"
-has an exclamation mark (C<!>) indicator. An "incrementable flag" has a plus
-sign (C<+>) indicator. The POSIX standard doesn't know flag indicators.
 
 The appearance of a flag on the command line sets its value (initial value)
 to true (C<!!1>).
