@@ -1,6 +1,7 @@
 Release history for Getopt-Guided
 
-2.1.0    Mon Dec 22 05:19:38 PM CET 2025
+3.0.0    Sun Dec 28 11:20:24 AM CET 2025
+         - BREAKING CHANGE: getopts3() function removed
          - Use end of options delimiter to finish options processing
          - Introduce new processopts() and processopts3() functions
          - Load Carp and File::Basename lazily

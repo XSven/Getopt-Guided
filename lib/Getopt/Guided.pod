@@ -6,7 +6,7 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
 
 =head1 SYNOPSIS
 
-  use Getopt::Guided qw( getopts getopts3 );
+  use Getopt::Guided qw( getopts );
 
   local @ARGV = qw( -d dv1 -c -v -a av1 -d dv2 -a av2 -d -- -vv v1 v2 );
 
@@ -14,7 +14,7 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
 
   # or
 
-  getopts3 @ARGV, 'a:bcd,v+', my %opts;
+  getopts 'a:bcd,v+', my %opts, @ARGV;
 
   # result
   # %opts == ( a => 'av2', c => !!1, d => [ 'dv1', 'dv2', '--' ], v => 3 )
@@ -105,11 +105,19 @@ value is provided for an option that has to have a mandatory argument.
 If any of the processing errors occurs, C<getopts()> restores C<@ARGV>
 before it warns and returns false.
 
+=head1 API CHANGES
+
+=over 2
+
+=item *
+
 As of version 1.1.0 this module provides the additional function C<getopts3(
 \@$\% )>.  This function has a 3rd "leading" parameter. The parameter is an
 array (passed by reference) of command-line argument values. It replaces the
 implicit use of C<@ARGV>. This module exports the C<getopts3()> function on
 request too.
+
+=back
 
 =head1 CAVEAT
 

@@ -5,7 +5,7 @@ use warnings;
 
 package Getopt::Guided;
 
-$Getopt::Guided::VERSION = 'v2.1.0';
+$Getopt::Guided::VERSION = 'v3.0.0';
 
 # End Of Options Delimiter
 sub EOOD () { '--' }
@@ -18,7 +18,7 @@ sub TRUE () { !!1 }
 # Perl boolean false value
 sub FALSE () { !!0 }
 
-@Getopt::Guided::EXPORT_OK = qw( EOOD getopts3 getopts processopts3 processopts );
+@Getopt::Guided::EXPORT_OK = qw( EOOD getopts processopts3 processopts );
 
 sub croakf ( $@ ) {
   @_ = ( ( @_ == 1 ? shift : sprintf shift, @_ ) . ', stopped' );
@@ -62,8 +62,8 @@ sub parse_spec ( $\%;$ ) {
 }
 
 # https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02>
-sub getopts3 ( \@$\% ) {
-  my ( $argv, $spec, $opts ) = @_;
+sub getopts ( $\%;\@ ) {
+  my ( $spec, $opts, $argv ) = @_;
 
   my $spec_as_hash;
   if ( ref $spec eq 'HASH' ) {
@@ -73,6 +73,7 @@ sub getopts3 ( \@$\% ) {
   }
   croakf "%s parameter isn't an empty hash", '%$opts'
     if %$opts;
+  $argv = \@ARGV unless defined $argv;
 
   my @argv_backup = @$argv;
   my @error;
@@ -142,8 +143,6 @@ sub getopts3 ( \@$\% ) {
   @error == 0
 }
 
-sub getopts ( $\% ) { my ( $spec, $opts ) = @_; getopts3 @ARGV, $spec, %$opts }
-
 sub processopts3 ( \@@ ) {
   my $argv          = shift;
   my $spec_as_array = do { my $t = 0; [ grep $t ^= 1, @_ ] }; ## no critic ( RequireBlockGrep )
@@ -152,7 +151,7 @@ sub processopts3 ( \@@ ) {
   my $spec_as_hash;
   parse_spec $_, %$spec_as_hash, 1 for @$spec_as_array;
 
-  return FALSE unless getopts3 @$argv, $spec_as_hash, my %opts;
+  return FALSE unless getopts $spec_as_hash, my %opts, @$argv;
 
   # This ordered processing could be a feature
   for ( my $i = 0 ; $i < @_ ; $i += 2 ) {
