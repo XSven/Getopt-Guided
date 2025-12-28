@@ -14,7 +14,7 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
 
   # or
 
-  getopts 'a:bcd,v+', my %opts, @ARGV;
+  getopts 'a:bcd,v+', ( my %opts ), @ARGV;
 
   # result
   # %opts == ( a => 'av2', c => !!1, d => [ 'dv1', 'dv2', '--' ], v => 3 )
@@ -111,20 +111,20 @@ before it warns and returns false.
 
 =item *
 
+As of version 3.0.0 this module no longer provides the C<getopts3()> function.
+Instead of that the C<getopts( $\%;\@ )> function has got a 3rd optional
+parameter.  This parameter is an array (passed by reference) of command-line
+argument values. It replaces the implicit use of C<@ARGV>.
+
+=item *
+
 As of version 1.1.0 this module provides the additional function C<getopts3(
-\@$\% )>.  This function has a 3rd "leading" parameter. The parameter is an
-array (passed by reference) of command-line argument values. It replaces the
-implicit use of C<@ARGV>. This module exports the C<getopts3()> function on
-request too.
+\@$\% )>.  This function has a 3rd "leading" parameter. This parameter is
+an array (passed by reference) of command-line argument values. It replaces
+the implicit use of C<@ARGV>. This module exports the C<getopts3()> function
+on request too.
 
 =back
-
-=head1 CAVEAT
-
-Even if you are currently using the two-parameter form of the C<getopts(
-$\% )> function of C<Getopts::Std>, the new implementation isn't a drop in
-replacement. The most crucial change is the type of the second parameter. The
-second parameter is not a hash reference anymore but a hash.
 
 =head1 SEE ALSO
 

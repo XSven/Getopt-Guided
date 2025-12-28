@@ -40,8 +40,10 @@ sub import {
 }
 
 # Implementation is based on m//gc with \G
-sub parse_spec ( $\%;$ ) {
+sub parse_spec ( $;\%$ ) {
   my ( $spec, $spec_as_hash, $spec_length_expected ) = @_;
+
+  $spec_as_hash = {} unless defined $spec_as_hash;
 
   my $spec_length_got;
   no warnings qw( uninitialized ); ## no critic ( ProhibitNoWarnings )
@@ -58,19 +60,14 @@ sub parse_spec ( $\%;$ ) {
   croakf '%s parameter specifies %d options (expected: %d)', '$spec', $spec_length_got, $spec_length_expected
     if defined $spec_length_expected and $spec_length_got != $spec_length_expected;
 
-  undef
+  $spec_as_hash
 }
 
 # https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02>
 sub getopts ( $\%;\@ ) {
   my ( $spec, $opts, $argv ) = @_;
 
-  my $spec_as_hash;
-  if ( ref $spec eq 'HASH' ) {
-    $spec_as_hash = $spec
-  } else {
-    parse_spec $spec, %$spec_as_hash
-  }
+  my $spec_as_hash = ref $spec eq 'HASH' ? $spec : parse_spec $spec;
   croakf "%s parameter isn't an empty hash", '%$opts'
     if %$opts;
   $argv = \@ARGV unless defined $argv;
