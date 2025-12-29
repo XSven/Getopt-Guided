@@ -12,3 +12,4 @@ t/extension.t
 t/processopts.t
 t/standard.t
 t/utility.t
+t/validation.t
