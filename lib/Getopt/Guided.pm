@@ -74,7 +74,6 @@ sub getopts ( $\%;\@ ) {
 
   my @argv_backup = @$argv;
   my @error;
-  my $grouped = FALSE;
   # Guideline 4, Guideline 9
   while ( @$argv and my ( $name, $rest ) = ( $argv->[ 0 ] =~ m/\A - (.) (.*)/ox ) ) {
     # Guideline 10
@@ -124,11 +123,9 @@ sub getopts ( $\%;\@ ) {
       # Guideline 5
       if ( $rest eq '' ) {
         # Shift delimeted option name
-        shift @$argv;
-        $grouped = FALSE
+        shift @$argv
       } else {
-        $argv->[ 0 ] = "-$rest"; ## no critic ( RequireLocalizedPunctuationVars )
-        $grouped = TRUE
+        $argv->[ 0 ] = "-$rest" ## no critic ( RequireLocalizedPunctuationVars )
       }
     }
 
