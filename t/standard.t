@@ -9,6 +9,7 @@ my $module;
 BEGIN {
   if ( defined $ENV{ UUT } and ( $module = $ENV{ UUT } ) eq 'Getopt::Std' ) {
     require_ok $module or BAIL_OUT "Cannot loade module '$module'!";
+    # Wrap Getopt::Std::getopts() to patch its PROTO section
     *getopts = sub ( $\%;\@ ) {
       my ( $spec, $opts, $argv ) = @_;
       local @ARGV = @$argv if defined $argv;
@@ -118,7 +119,7 @@ subtest 'Unknown option' => sub {
   local @ARGV = qw( -b -d bar -a foo );
   my %got_opts;
   if ( $module eq 'Getopt::Std' ) {
-    warning_like { ok !getopts( 'a:b', %got_opts ), 'Failed' } qr/Unknown option: d/, 'Check warning';
+    warning_like { ok !getopts( 'a:b', %got_opts ), 'Failed' } qr/\AUnknown option: d/, 'Check warning';
     is_deeply \%got_opts, { b => 1 }, 'Options set partially';
     is_deeply \@ARGV, [ qw( bar -a foo ) ], '@ARGV processed partially'
   } else {

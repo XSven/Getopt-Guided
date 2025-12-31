@@ -27,19 +27,26 @@ L<getopts|https://pubs.opengroup.org/onlinepubs/9799919799/utilities/getopts.htm
 POSIX utility retrieves options and option-arguments from a
 list of command-line arguments. It supports the L<POSIX utility syntax
 guidelines|https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html#tag_12_02>
-3 to 10, inclusive.
+3 to 10, inclusive. C<getopts> is an iterator. The variable C<OPTIND> stores
+the position of the next element of the command-line argument list to be
+searched for an option character.
 
-The C<getopts( $;$ )> function of the L<Getopts::Std> core module provides
-a rudimentary implementation of this utility.  This module exposes a new
-implementation through the C<getopts( $\%;\@ )> function. The primary
-implementation differences are
+The C<getopts( $;$ )> function of the L<Getopts::Std> Perl core module
+provides an implementation of the C<getopts> utility. It isn't an iterator
+function but processes the command-line argument list in a single call.
+C<Getopt::Guided> exposes a new implementation through the C<getopts( $\%;\@
+)> function. The primary implementation differences are
 
-                         | Getopt::Std impl | Getopt::Guided impl
-  -----------------------+------------------+----------------------------
-  exported               | by default       | on request
-  2nd parameter          | hash reference   | hash (passed by reference)
-  optional 3rd parameter | none             | array (passed by reference), which
-                         |                  | defaults to @ARGV
+  Topic                   | Getopt::Std impl  | Getopt::Guided impl
+  ------------------------+-------------------+----------------------------
+  exported                | by default        | on request
+  2nd parameter           | hash reference    | hash (passed by reference)
+  optional 3rd parameter  | none              | array (passed by reference),
+                          |                   | which defaults to @ARGV
+  unknown option          | partial parse and | restore @ARGV and warn user
+                          | warn user         |
+  missing option-argument | partial parse and | restore @ARGV and warn user
+                          | don't warn user   |
 
 =head1 COMMAND-LINE ARGUMENTS
 
