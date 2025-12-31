@@ -29,7 +29,7 @@ list of command-line arguments. It supports the L<POSIX utility syntax
 guidelines|https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html#tag_12_02>
 3 to 10, inclusive. C<getopts> is an iterator. The variable C<OPTIND> stores
 the position of the next element of the command-line argument list to be
-searched for an option character.
+searched for an option name.
 
 The C<getopts( $;$ )> function of the L<Getopts::Std> Perl core module
 provides an implementation of the C<getopts> utility. It isn't an iterator
@@ -37,16 +37,16 @@ function but processes the command-line argument list in a single call.
 C<Getopt::Guided> exposes a new implementation through the C<getopts( $\%;\@
 )> function. The primary implementation differences are
 
-  Topic                   | Getopt::Std impl  | Getopt::Guided impl
-  ------------------------+-------------------+----------------------------
-  exported                | by default        | on request
-  2nd parameter           | hash reference    | hash (passed by reference)
-  optional 3rd parameter  | none              | array (passed by reference),
-                          |                   | which defaults to @ARGV
-  unknown option          | partial parse and | restore @ARGV and warn user
-                          | warn user         |
-  missing option-argument | partial parse and | restore @ARGV and warn user
-                          | don't warn user   |
+  Topic                    | Getopt::Std impl  | Getopt::Guided impl
+  -------------------------+-------------------+----------------------------
+  exported                 | by default        | on request
+  2nd parameter            | hash reference    | hash (passed by reference)
+  3rd parameter (optional) | none              | array (passed by reference),
+                           |                   | which defaults to @ARGV
+  unknown option           | partial parse and | restore @ARGV and warn user
+                           | warn user         |
+  missing option-argument  | partial parse and | restore @ARGV and warn user
+                           | don't warn user   |
 
 =head1 COMMAND-LINE ARGUMENTS
 
@@ -68,16 +68,47 @@ If an option name is followed by a colon (C<:>) character or a comma (C<,>)
 character, the option should have an option-argument which either shall be
 supplied as a separate argument (C<( '-a', 'foo' )>) or shall be part of the
 same argument string as the option name (C<( '-afoo' )>).  We call an option
-whose option name is followed by a colon (comma) option-argument indicator a
-"common option" ("list option").  The POSIX standard knows only common options.
+whose option name is followed by a colon/comma "option-argument indicator"
+a "common option"/"list option".  The POSIX standard knows only common options.
 
 An option that does not require an option-argument is called a flag. The flag
 name can optionally be followed by an exclamation mark (C<!>) character or
 a plus sign (C<+>) character. We call a flag whose flag name is followed by
-an exclamation mark (plus sign) flag-type indicator a "negatable flag" (an
-"incrementable flag"). The POSIX standard doesn't know flag-type indicators.
+an exclamation mark/plus sign "flag-type indicator" a "negatable flag"/an
+"incrementable flag". The POSIX standard doesn't know flag-type indicators.
+
+=head1 NAME-VALUE MAP
+
+The name-value map C<%opts> is the second parameter of the C<getopts()>
+function. It is an empty hash (passed by reference) that stores the processing
+result of the C<getopts()> function. Each hash key refers to an option
+name and the corresponding hash value refers to the option-argument value
+(or the flag value). The hash value of a list option is an array reference.
 
 =head1 PROCESSING
+
+The implementation follows the L<POSIX utility syntax
+guidelines|https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html#tag_12_02>
+4 to 10, inclusive. The C<getopts()> function warns and returns false if a
+processing error occurs; otherwise the function returns true. The processing
+error types are:
+
+=over 3
+
+=item 1.
+
+illegal option
+
+=item 2.
+
+option requires an argument
+
+=back
+
+The 2nd processing error occurs if either no argument or the C<undef> value
+is provided for an option that has to have an option-argument.  If any of
+the processing errors occurs, the C<getopts()> function restores C<@ARGV>
+before it warns and returns false.
 
 If a common option is repeated, its arguments overwrite each other and the
 last argument wins.
@@ -95,37 +126,6 @@ on each occurrence.
 If an incrementable flag is repeated, its initial value (its IV value)
 will be incremented by one on each occurrence.  Use case: An incrementable
 verbosity level can be represented by a C<v+> flag specification.
-
-=head1 DESCRIPTION
-
-The second parameter is the "name-value map" C<%opts>. It is an empty hash
-(passed by reference) that stores the C<getopts()> processing result. Each
-hash key refers to an option name and the corresponding hash value refers
-to the option-argument value (or the flag value). The hash value of a list
-option is an array reference.
-
-The new implementation follows the L<POSIX utility syntax
-guidelines|https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html#tag_12_02>
-4 to 10, inclusive. C<getopts()> warns and returns false if a processing error
-occurs; otherwise the function returns true. The processing error types are:
-
-=over 3
-
-=item 1.
-
-illegal option
-
-=item 2.
-
-option requires an argument
-
-=back
-
-The second processing error occurs if either no argument or the C<undef>
-value is provided for an option that has to have a mandatory argument.
-
-If any of the processing errors occurs, C<getopts()> restores C<@ARGV>
-before it warns and returns false.
 
 =head1 API CHANGES
 
