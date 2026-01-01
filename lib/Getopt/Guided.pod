@@ -8,11 +8,7 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
 
   use Getopt::Guided qw( getopts );
 
-  local @ARGV = qw( -d dv1 -c -v -a av1 -d dv2 -a av2 -d -- -vv v1 v2 );
-
-  getopts 'a:bcd,v+', my %opts;
-
-  # or
+  local @ARGV = qw( -d dv1 -c -va av1 -ddv2 -a av2 -d -- -vv v1 v2 );
 
   getopts 'a:bcd,v+', ( my %opts ), @ARGV;
 
@@ -65,17 +61,19 @@ function.  It is a non-empty string containing the option names (the single
 alphanumeric characters) recognized by the C<getopts()> function.
 
 If an option name is followed by a colon (C<:>) character or a comma (C<,>)
-character, the option should have an option-argument which either shall be
-supplied as a separate argument (C<( '-a', 'foo' )>) or shall be part of the
-same argument string as the option name (C<( '-afoo' )>).  We call an option
-whose option name is followed by a colon/comma "option-argument indicator"
-a "common option"/"list option".  The POSIX standard knows only common options.
+character, the option should have an option-argument which either shall
+be supplied as a separate argument (C<( '-a', 'foo' )>) or shall be part
+of the same argument string as the option name (C<( '-afoo' )>).  We call
+an option whose option name is followed by a colon/comma "option-argument
+indicator" a "common option"/"list option". A list option is sometimes called
+"multi-value option".  The POSIX standard knows only common options.
 
 An option that does not require an option-argument is called a flag. The flag
 name can optionally be followed by an exclamation mark (C<!>) character or
 a plus sign (C<+>) character. We call a flag whose flag name is followed by
 an exclamation mark/plus sign "flag-type indicator" a "negatable flag"/an
-"incrementable flag". The POSIX standard doesn't know flag-type indicators.
+"incrementable flag". An incrementable flag is sometimes called "cumulative
+flag". The POSIX standard doesn't know flag-type indicators.
 
 =head1 NAME-VALUE MAP
 
@@ -110,22 +108,19 @@ is provided for an option that has to have an option-argument.  If any of
 the processing errors occurs, the C<getopts()> function restores C<@ARGV>
 before it warns and returns false.
 
-If a common option is repeated, its arguments overwrite each other and the
-last argument wins.
+=head2 REPEATED OPTIONS
 
-If a list option is repeated, its arguments are pushed onto a list.
+If a common option is repeated, its option-arguments overwrite each other
+and the last option-argument wins.  If a list option is repeated, its
+option-arguments are pushed onto a list.
 
 The appearance of a flag on the command line sets its value (initial value)
-to true (C<!!1>).
-
-If a flag with no indicator is repeated, its initial value will not change.
-
-If a negatable flag is repeated, its initial value will be logically negated
-on each occurrence.
-
-If an incrementable flag is repeated, its initial value (its IV value)
-will be incremented by one on each occurrence.  Use case: An incrementable
-verbosity level can be represented by a C<v+> flag specification.
+to true (C<!!1>).  If a flag with no flag-type indicator is repeated, its
+initial value will not change.  If a negatable flag is repeated, its initial
+value will be logically negated on each occurrence.  If an incrementable flag
+is repeated, its initial value (its IV value) will be incremented by one on
+each occurrence.  Use case: A verbosity level can be represented by a C<v+>
+incrementable flag.
 
 =head1 API CHANGES
 
@@ -136,21 +131,24 @@ verbosity level can be represented by a C<v+> flag specification.
 As of version 3.0.0 this module no longer provides the C<getopts3()> function.
 Instead of that the C<getopts( $\%;\@ )> function has got a 3rd optional
 parameter.  This parameter is an array (passed by reference) of command-line
-argument values. It replaces the implicit use of C<@ARGV>.
+arguments. It replaces the implicit use of C<@ARGV>.
 
 =item *
 
 As of version 1.1.0 this module provides the additional function C<getopts3(
-\@$\% )>.  This function has a 3rd "leading" parameter. This parameter is
-an array (passed by reference) of command-line argument values. It replaces
-the implicit use of C<@ARGV>. This module exports the C<getopts3()> function
-on request too.
+\@$\% )>.  This function has a 3rd "leading" parameter. This parameter is an
+array (passed by reference) of command-line arguments. It replaces the implicit
+use of C<@ARGV>. This module exports the C<getopts3()> function on request too.
 
 =back
 
 =head1 SEE ALSO
 
 =over 2
+
+=item *
+
+L<Tie::Hash::MultiValueOpts>
 
 =item *
 
