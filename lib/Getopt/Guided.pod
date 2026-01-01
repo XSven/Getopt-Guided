@@ -27,7 +27,7 @@ guidelines|https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.h
 the position of the next element of the command-line argument list to be
 searched for an option name.
 
-The C<getopts( $;$ )> function of the L<Getopts::Std> Perl core module
+The C<getopts( $;$ )> function of the L<Getopt::Std> Perl core module
 provides an implementation of the C<getopts> utility. It isn't an iterator
 function but processes the command-line argument list in a single call.
 C<Getopt::Guided> exposes a new implementation through the C<getopts( $\%;\@
@@ -52,7 +52,7 @@ single alphanumeric (C<[[:alnum:]]>) characters, are known as options. Certain
 options are followed by an option-argument.  The arguments following the
 last options and option-arguments are named operands.
 
-In Perl the array C<@ARGV> contains the command-line arguments.
+In Perl the array L<perlvar/@ARGV> contains the command-line arguments.
 
 =head1 OPTIONS SPECIFICATION
 
@@ -60,13 +60,13 @@ The options specification C<$spec> is the first parameter of the C<getopts()>
 function.  It is a non-empty string containing the option names (the single
 alphanumeric characters) recognized by the C<getopts()> function.
 
-If an option name is followed by a colon (C<:>) character or a comma (C<,>)
-character, the option should have an option-argument which either shall
-be supplied as a separate argument (C<( '-a', 'foo' )>) or shall be part
-of the same argument string as the option name (C<( '-afoo' )>).  We call
-an option whose option name is followed by a colon/comma "option-argument
-indicator" a "common option"/"list option". A list option is sometimes called
-"multi-value option".  The POSIX standard knows only common options.
+If an option name (C<a>) is followed by a colon (C<:>) character or a comma
+(C<,>) character, the option should have an option-argument which either
+shall be supplied as a separate argument (C<-a foo>) or shall be part of the
+same argument string as the option name (C<-afoo>).  We call an option whose
+option name is followed by a colon/comma "option-argument indicator" a "common
+option"/"list option". A list option is sometimes called "multi-value option".
+The POSIX standard knows only common options.
 
 An option that does not require an option-argument is called a flag. The flag
 name can optionally be followed by an exclamation mark (C<!>) character or
