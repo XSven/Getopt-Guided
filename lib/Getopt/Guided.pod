@@ -27,11 +27,11 @@ guidelines|https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.h
 the position of the next element of the command-line argument list to be
 searched for an option name.
 
-The C<getopts( $;$ )> function of the L<Getopt::Std> Perl core module
-provides an implementation of the C<getopts> utility. It isn't an iterator
-function but processes the command-line argument list in a single call.
-C<Getopt::Guided> exposes a new implementation through the C<getopts( $\%;\@
-)> function. The primary implementation differences are
+The C<getopts( $;$ )> function of the L<Getopt::Std> Perl core module provides
+an implementation of the C<getopts> utility. It isn't an iterator function but
+parses the command-line argument list in a single call.  C<Getopt::Guided>
+exposes a new implementation through the C<getopts( $\%;\@ )> function. The
+primary implementation differences are
 
   Topic                    | Getopt::Std impl  | Getopt::Guided impl
   -------------------------+-------------------+----------------------------
@@ -78,18 +78,18 @@ flag". The POSIX standard doesn't know flag-type indicators.
 =head1 NAME-VALUE MAP
 
 The name-value map C<%opts> is the second parameter of the C<getopts()>
-function. It is an empty hash (passed by reference) that stores the processing
+function. It is an empty hash (passed by reference) that stores the parse
 result of the C<getopts()> function. Each hash key refers to an option
 name and the corresponding hash value refers to the option-argument value
 (or the flag value). The hash value of a list option is an array reference.
 
-=head1 PROCESSING
+=head1 PARSING
 
 The implementation follows the L<POSIX utility syntax
 guidelines|https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html#tag_12_02>
-4 to 10, inclusive. The C<getopts()> function warns and returns false if a
-processing error occurs; otherwise the function returns true. The processing
-error types are:
+4 to 10, inclusive. The C<getopts()> function warns and returns false if
+a parse error occurs; otherwise the function returns true. The parse error
+types are:
 
 =over 3
 
@@ -103,10 +103,10 @@ option requires an argument
 
 =back
 
-The 2nd processing error occurs if either no argument or the C<undef> value
-is provided for an option that has to have an option-argument.  If any of
-the processing errors occurs, the C<getopts()> function restores C<@ARGV>
-before it warns and returns false.
+The 2nd parse error occurs if either no argument or the C<undef> value is
+provided for an option that has to have an option-argument.  If any of the
+parse errors occurs, the C<getopts()> function restores C<@ARGV> and clears
+C<%opts> before it warns and returns false.
 
 =head2 REPEATED OPTIONS
 
