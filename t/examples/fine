@@ -4,7 +4,7 @@ use warnings;
 $main::VERSION = 'v6.6.6';
 
 use File::Basename qw( basename );
-use Getopt::Guided qw( EOOD processopts3 );
+use Getopt::Guided qw( EOOD processopts );
 
 sub print_version {
   printf STDOUT "%s %s\n", basename( $0 ), $main::VERSION;
@@ -14,7 +14,7 @@ sub print_version {
 sub run ( \@ ) {
   my @argv = @{ $_[ 0 ] };
 
-  return 2 unless processopts3 @argv, V => \&print_version, h => sub { };
+  return 2 unless processopts @argv, V => \&print_version, h => sub { };
   0
 }
 

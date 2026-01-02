@@ -18,7 +18,7 @@ sub TRUE () { !!1 }
 # Perl boolean false value
 sub FALSE () { !!0 }
 
-@Getopt::Guided::EXPORT_OK = qw( EOOD getopts processopts3 processopts );
+@Getopt::Guided::EXPORT_OK = qw( EOOD getopts processopts );
 
 sub croakf ( $@ ) {
   @_ = ( ( @_ == 1 ? shift : sprintf shift, @_ ) . ', stopped' );
@@ -144,7 +144,7 @@ sub getopts ( $\%;\@ ) {
   @error == 0
 }
 
-sub processopts3 ( \@@ ) {
+sub processopts ( \@@ ) {
   my $argv          = shift;
   my $spec_as_array = do { my $t = 0; [ grep $t ^= 1, @_ ] }; ## no critic ( RequireBlockGrep )
 
@@ -178,7 +178,5 @@ sub processopts3 ( \@@ ) {
 
   TRUE
 }
-
-sub processopts ( @ ) { processopts3 @ARGV, @_ }
 
 1

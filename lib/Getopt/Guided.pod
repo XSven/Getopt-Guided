@@ -52,7 +52,7 @@ single alphanumeric (C<[[:alnum:]]>) characters, are known as options. Certain
 options are followed by an option-argument.  The arguments following the
 last options and option-arguments are named operands.
 
-In Perl the array L<perlvar/@ARGV> contains the command-line arguments.
+In Perl the array L<@ARGV|perlvar/@ARGV> contains the command-line arguments.
 
 =head1 OPTIONS SPECIFICATION
 
