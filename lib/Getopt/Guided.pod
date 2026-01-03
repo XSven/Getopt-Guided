@@ -8,9 +8,10 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
 
   use Getopt::Guided qw( getopts );
 
-  local @ARGV = qw( -d dv1 -c -va av1 -ddv2 -a av2 -d -- -vv v1 v2 );
+  my @argv = qw( -d dv1 -c -va av1 -ddv2 -a av2 -d -- -vv v1 v2 );
 
-  getopts 'a:bcd,v+', ( my %opts ), @ARGV;
+  # If omitted @argv defaults to @ARGV
+  getopts 'a:bcd,v+', ( my %opts ), @argv;
 
   # result
   # %opts == ( a => 'av2', c => !!1, d => [ 'dv1', 'dv2', '--' ], v => 3 )
@@ -83,6 +84,12 @@ result of the C<getopts()> function. Each hash key refers to an option
 name and the corresponding hash value refers to the option-argument value
 (or the flag value). The hash value of a list option is an array reference.
 
+=head1 COMMAND-LINE ARGUMENTS LIST
+
+The command-line arguments list C<@argv> is the third (optional) parameter of
+the C<getopts()> function. It must be passed by reference. If this parameter is
+omitted, the C<getopts()> function defaults to using the global C<@ARGV> array.
+
 =head1 PARSING
 
 The implementation follows the L<POSIX utility syntax
@@ -121,26 +128,6 @@ value will be logically negated on each occurrence.  If an incrementable flag
 is repeated, its initial value (its IV value) will be incremented by one on
 each occurrence.  Use case: A verbosity level can be represented by a C<v+>
 incrementable flag.
-
-=head1 API CHANGES
-
-=over 2
-
-=item *
-
-As of version 3.0.0 this module no longer provides the C<getopts3()> function.
-Instead of that the C<getopts( $\%;\@ )> function has got a 3rd optional
-parameter.  This parameter is an array (passed by reference) of command-line
-arguments. It replaces the implicit use of C<@ARGV>.
-
-=item *
-
-As of version 1.1.0 this module provides the additional function C<getopts3(
-\@$\% )>.  This function has a 3rd "leading" parameter. This parameter is an
-array (passed by reference) of command-line arguments. It replaces the implicit
-use of C<@ARGV>. This module exports the C<getopts3()> function on request too.
-
-=back
 
 =head1 SEE ALSO
 
