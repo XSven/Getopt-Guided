@@ -21,7 +21,7 @@ subtest 'Provoke exceptions' => sub {
   like exception {
     processopts @argv, ':a:' => $fail_cb
   }, qr/isn't a non-empty string of alphanumeric/, "Leading ':' character is not allowed";
-  is_deeply \@argv, [ qw( -I blib/lib -a foo -I blib/arch ) ], '@ARGV not changed';
+  is_deeply \@argv, [ qw( -I blib/lib -a foo -I blib/arch ) ], '@argv not changed';
 
   like exception { processopts @argv, 'a:b' => $fail_cb }, qr/specifies 2 options \(expected: 1\)/,
     'Single option specification expected';
@@ -59,7 +59,7 @@ subtest 'Callback destination: common option' => sub {
   is $value,     'foo', 'Check 0th callback argument assigned to closure variable (value)';
   is $name,      'a',   'Check 1st callback argument assigned to closure variable (name)';
   is $indicator, ':',   'Check 2nd callback argument assigned to closure variable (indicator)';
-  is @ARGV,      0,     '@argv is empty'
+  is @argv,      0,     '@argv is empty'
 };
 
 subtest 'Scalar reference destination: common option' => sub {
@@ -68,7 +68,7 @@ subtest 'Scalar reference destination: common option' => sub {
   my @argv = qw( -a baz );
   ok processopts( @argv, 'a:' => \my $value ), 'Succeeded';
   is $value, 'baz', 'Check common option value';
-  is @ARGV,  0,     '@argv is empty'
+  is @argv,  0,     '@argv is empty'
 };
 
 subtest 'Callback destination: common option and usual flag' => sub {
@@ -104,7 +104,7 @@ subtest 'Callback destination: list option and incrementable flag' => sub {
     'I,' => sub { is_deeply $_[ 0 ], [ qw( lib local/lib/perl5 ) ], 'Check 0th callback argument' }
     ),
     'Succeeded';
-  is @ARGV, 0, '@argv is empty'
+  is @argv, 0, '@argv is empty'
 };
 
 subtest 'Scalar reference destination: list option and incrementable flag' => sub {
