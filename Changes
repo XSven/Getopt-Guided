@@ -1,8 +1,8 @@
 Release history for Getopt-Guided
 
-3.0.0    Fri Jan  2 06:46:58 PM CET 2026
+3.0.0    Sun Jan  4 08:53:59 AM CET 2026
          - BREAKING CHANGE: getopts3() function removed
-         - Introduce new processopts() function
+         - Introduce new processopts() function (beta pre-release)
          - Load Carp and File::Basename lazily
          - Rewrite documentation
          - Tidy source code

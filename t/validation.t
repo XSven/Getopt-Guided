@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT like ok plan subtest use_ok ) ], tests => 4;
+use Test::More import => [ qw( BAIL_OUT like ok plan subtest use_ok ) ], tests => 5;
 use Test::Fatal qw( exception );
 
 my $module;
@@ -10,6 +10,8 @@ BEGIN {
   $module = 'Getopt::Guided';
   use_ok $module, qw( getopts ) or BAIL_OUT "Cannot loade module '$module'!"
 }
+
+like exception { $module->can( 'croakf' )->( 'message only' ) }, qr/message only/, 'croakf() without "f"';
 
 like exception { $module->import( '_private' ) }, qr/not exported/, 'Export error';
 

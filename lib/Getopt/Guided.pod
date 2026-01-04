@@ -13,7 +13,7 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
   # If omitted @argv defaults to @ARGV
   getopts 'a:bcd,v+', ( my %opts ), @argv;
 
-  # result
+  # Parse result
   # %opts == ( a => 'av2', c => !!1, d => [ 'dv1', 'dv2', '--' ], v => 3 )
   # @ARGV == ( 'v1', 'v2' )
 
@@ -24,9 +24,9 @@ L<getopts|https://pubs.opengroup.org/onlinepubs/9799919799/utilities/getopts.htm
 POSIX utility retrieves options and option-arguments from a
 list of command-line arguments. It supports the L<POSIX utility syntax
 guidelines|https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.html#tag_12_02>
-3 to 10, inclusive. C<getopts> is an iterator. The variable C<OPTIND> stores
-the position of the next element of the command-line argument list to be
-searched for an option name.
+3 to 10, inclusive. C<getopts> is an iterator. The variable C<OPTIND>
+(option index) stores the position of the next element of the command-line
+argument list to be searched for an option name.
 
 The C<getopts( $;$ )> function of the L<Getopt::Std> Perl core module provides
 an implementation of the C<getopts> utility. It isn't an iterator function but
