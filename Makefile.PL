@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker::CPANfile;    # do not supply an empty list because impo
 use File::Spec::Functions qw( catfile );
 
 my @main_module_namespace = qw( Getopt Guided );
-my $release_status        = 'stable';              # transition: unstable => testing => stable
+my $release_status        = 'testing';             # transition: unstable => testing => stable
 
 my $distname            = join '-',  @main_module_namespace;
 my $main_module         = join '::', @main_module_namespace;

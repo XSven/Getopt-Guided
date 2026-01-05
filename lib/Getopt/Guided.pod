@@ -11,7 +11,7 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
   my @argv = qw( -d dv1 -c -va av1 -ddv2 -a av2 -d -- -vv v1 v2 );
 
   # If omitted @argv defaults to @ARGV
-  getopts 'a:bcd,v+', ( my %opts ), @argv;
+  getopts( 'a:bcd,v+', my %opts, @argv );
 
   # Parse result
   # %opts == ( a => 'av2', c => !!1, d => [ 'dv1', 'dv2', '--' ], v => 3 )

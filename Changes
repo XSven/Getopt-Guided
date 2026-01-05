@@ -1,5 +1,8 @@
 Release history for Getopt-Guided
 
+3.0.1    Mon Jan  5 08:02:43 AM CET 2026
+         -
+
 3.0.0    Sun Jan  4 08:53:59 AM CET 2026
          - BREAKING CHANGE: getopts3() function removed
          - Introduce new processopts() function (beta pre-release)
