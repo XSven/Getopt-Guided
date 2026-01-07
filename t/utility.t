@@ -12,7 +12,7 @@ subtest 'Utility is broken: getopts has $spec error' => sub {
 
   my $utility = catfile( qw( t examples broken ) );
   script_compiles $utility;
-  script_fails $utility, { exit => 2 }, 'Check exit status';
+  script_fails $utility, { exit => 255 }, 'Check exit status';
   script_stderr_like
     qr/\A\$spec parameter isn't a non-empty string of alphanumeric characters, stopped at \Q$utility\E.*/, ## no critic ( ProhibitComplexRegexes )
     'Check standard error output'

@@ -5,7 +5,7 @@ use warnings;
 
 package Getopt::Guided;
 
-$Getopt::Guided::VERSION = 'v3.0.1';
+$Getopt::Guided::VERSION = 'v3.0.2';
 
 # End Of Options Delimiter
 sub EOOD () { '--' }

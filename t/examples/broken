@@ -7,8 +7,12 @@ sub run ( \@ ) {
   my @argv = @{ $_[ 0 ] };
 
   unless ( eval { getopts( '-a:b', my %opts, @argv ) } ) {
-    print STDERR $@ if $@;
-    return 2
+    if ( $@ ) {
+      print STDERR $@;
+      return 255
+    } else {
+      return 2
+    }
   }
   0
 }
