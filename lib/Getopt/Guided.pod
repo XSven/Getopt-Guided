@@ -141,6 +141,10 @@ L<Tie::Hash::MultiValueOpts>
 
 L<Tacit list of POSIX short options|https://stackoverflow.com/questions/56131811/is-there-a-tacit-list-of-reserved-names-for-posix-short-options>
 
+=item *
+
+L<The -W option of GNU getopt()|https://stackoverflow.com/questions/14338223/what-is-the-w-option-of-gnu-getopt-used-for>
+
 =back
 
 =head1 AUTHOR
