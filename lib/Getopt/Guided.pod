@@ -98,18 +98,6 @@ guidelines|https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap12.h
 a parse error occurs; otherwise the function returns true. The parse error
 types are:
 
-=head1 SEMANTIC
-
-The C<processopts( \@@ )> function adds semantic to the parse result provided
-by the C<getopts()> function.  The command-line arguments list C<@argv>
-is its first (mandatory) parameter.  It must be passed by reference. A
-possible value of this parameter is the global C<ARGV> array.  The remaining
-parameters form a non-empty list with an even number of elements. Each
-even-numbered element represents a single option specification.  The element
-(an odd-numbered element) that follows such an option specification is
-called its "destination". The destination has to be a SCALAR, ARRAY, or
-CODE reference.
-
 =over 3
 
 =item 1.
@@ -138,8 +126,29 @@ to true (C<!!1>).  If a flag with no flag-type indicator is repeated, its
 initial value will not change.  If a negatable flag is repeated, its initial
 value will be logically negated on each occurrence.  If an incrementable flag
 is repeated, its initial value (its IV value) will be incremented by one on
-each occurrence.  Use case: A verbosity level can be represented by a C<v+>
+each occurrence.  Use case: A verbosity level can be represented by a "v+"
 incrementable flag.
+
+=head1 SEMANTIC
+
+The C<processopts( \@@ )> function adds semantic to the parse result provided
+by the C<getopts()> function.
+
+The command-line arguments list C<@argv> is the first parameter of the
+C<processopts()> function.  The list must be passed by reference. A possible
+value of this parameter is the global C<ARGV> array.  The remaining function
+parameters form a non-empty list with an even number of elements. Each
+even-numbered element represents a single option specification.  The element
+that follows such an option specification (an odd-numbered element) is
+called its "option destination". The destination has to be a SCALAR, an ARRAY,
+or a CODE reference.
+
+The option specification/option destination pairs are applied in order to
+the parse result. This feature can be used to implement best practices such
+as ensuring that a "-V" (version) option should have a higher precedence
+(semantic priority) than a "-h" (help) option:
+
+  processopts @argv, V => sub { ... }, h => sub { ... };
 
 =head1 SEE ALSO
 
