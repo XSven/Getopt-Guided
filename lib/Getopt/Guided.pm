@@ -18,7 +18,7 @@ sub TRUE () { !!1 }
 # Perl boolean false value
 sub FALSE () { !!0 }
 
-@Getopt::Guided::EXPORT_OK = qw( EOOD getopts processopts );
+@Getopt::Guided::EXPORT_OK = qw( getopts print_version_info processopts );
 
 sub croakf ( $@ ) {
   @_ = ( ( @_ == 1 ? shift : sprintf shift, @_ ) . ', stopped' );
@@ -142,6 +142,15 @@ sub getopts ( $\%;\@ ) {
   }
 
   @error == 0
+}
+
+sub print_version_info {
+  # Prepare and print version info message:
+  # - Program name and version (first line)
+  # - Interpreter name ("perl") and version (second line)
+  require File::Basename;
+  printf STDOUT "%s %s\nperl v%vd\n", File::Basename::basename( $0 ), $main::VERSION, $^V;
+  EOOD
 }
 
 sub processopts ( \@@ ) {

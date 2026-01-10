@@ -9,7 +9,7 @@ my $module;
 
 BEGIN {
   $module = 'Getopt::Guided';
-  use_ok $module, qw( EOOD processopts ) or BAIL_OUT "Cannot loade module '$module'!"
+  use_ok $module, qw( print_version_info processopts ) or BAIL_OUT "Cannot loade module '$module'!"
 }
 
 my $fail_cb = sub { fail "'$_[ 1 ]' callback shouldn't be called" };
@@ -139,9 +139,10 @@ subtest 'Unknown option' => sub {
 subtest 'Semantic priority' => sub {
   plan tests => 2;
 
+  local $main::VERSION = 'v6.6.6';
   # -h comes first on purpose
   my @argv = qw( -h -V );
   # Best pratice: -V should have higher precedence (semantic priority) than -h
-  ok processopts( @argv, 'V' => sub { EOOD }, 'h' => $fail_cb ), 'Succeeded';
+  ok processopts( @argv, 'V' => \&print_version_info, 'h' => $fail_cb ), 'Succeeded';
   is @argv, 0, '@argv is empty'
 }

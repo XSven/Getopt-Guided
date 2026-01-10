@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More import => [ qw( plan subtest ) ], tests => 3;
-use Test::Script qw( script_compiles script_fails script_runs script_stderr_is script_stdout_is script_stderr_like );
+use Test::Script qw( script_compiles script_fails script_runs script_stderr_is script_stdout_like script_stderr_like );
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile );
@@ -33,5 +33,6 @@ subtest 'Ask utility for its version information' => sub {
   my $utility = catfile( qw( t examples fine ) );
   script_compiles $utility;
   script_runs [ $utility, '-V' ], 'Check exit status';
-  script_stdout_is basename( $utility ) . " v6.6.6\n", 'Check standard output'
+  script_stdout_like qr/\A ${ \( basename( $utility ) ) } \  v6\.6\.6 \n perl \  v\d+\.\d+\.\d+ \n \z/x,
+    'Check standard output'
 }
