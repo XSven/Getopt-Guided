@@ -2,8 +2,11 @@ use strict;
 use warnings;
 
 use Test::More import => [ qw( BAIL_OUT fail is is_deeply like ok plan subtest use_ok ) ], tests => 11;
-use Test::Fatal qw( exception );
-use Test::Warn  qw( warning_like );
+use Test::Fatal  qw( exception );
+use Test::Output qw( stdout_like  );
+use Test::Warn   qw( warning_like );
+
+use File::Basename qw( basename );
 
 my $module;
 
@@ -137,12 +140,13 @@ subtest 'Unknown option' => sub {
 };
 
 subtest 'Semantic priority' => sub {
-  plan tests => 2;
+  plan tests => 3;
 
   local $main::VERSION = 'v6.6.6';
   # -h comes first on purpose
   my @argv = qw( -h -V );
   # Best pratice: -V should have higher precedence (semantic priority) than -h
-  ok processopts( @argv, 'V' => \&print_version_info, 'h' => $fail_cb ), 'Succeeded';
+  stdout_like { is processopts( @argv, 'V' => \&print_version_info, 'h' => $fail_cb ), '-V', 'Succeeded' }
+    qr/\A ${ \( basename( __FILE__ ) ) } \  v6\.6\.6 \n perl \  v\d+\.\d+\.\d+ \n \z/x, 'Check version info';
   is @argv, 0, '@argv is empty'
 }
