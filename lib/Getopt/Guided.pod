@@ -61,10 +61,10 @@ The options specification C<$spec> is the first parameter of the C<getopts()>
 function.  It is a non-empty string containing the option names (the single
 alphanumeric characters) recognized by the C<getopts()> function.
 
-If an option name (C<a>) is followed by a colon (C<:>) character or a comma
+If an option name ("a") is followed by a colon (C<:>) character or a comma
 (C<,>) character, the option should have an option-argument which either
-shall be supplied as a separate argument (C<-a foo>) or shall be part of the
-same argument string as the option name (C<-afoo>).  We call an option whose
+shall be supplied as a separate argument ("-a foo") or shall be part of the
+same argument string as the option name ("-afoo").  We call an option whose
 option name is followed by a colon/comma "option-argument indicator" a "common
 option"/"list option". A list option is sometimes called "multi-value option".
 The POSIX standard knows only common options.
@@ -138,9 +138,9 @@ The command-line arguments list C<@argv> is the first parameter of the
 C<processopts()> function.  The list must be passed by reference. A possible
 value of this parameter is the global C<ARGV> array.  The remaining function
 parameters form a non-empty list with an even number of elements. Each
-even-numbered element represents a single option specification.  The element
-that follows such an option specification (an odd-numbered element) is
-called its "option destination". The destination has to be a SCALAR, an ARRAY,
+even-numbered element represents a single "option specification".  The element
+that follows such an option specification (an odd-numbered element) is called
+its "option destination". The destination has to be a SCALAR, an ARRAY,
 or a CODE reference.
 
 The option specification/option destination pairs are applied in order to
@@ -148,7 +148,7 @@ the parse result. This feature can be used to implement best practices such
 as ensuring that a "-V" (version) option should have a higher precedence
 (semantic priority) than a "-h" (help) option:
 
-  processopts @argv, V => sub { ... }, h => sub { ... };
+  processopts @argv, 'V' => sub { ... }, 'h' => sub { ... };
 
 =head1 SEE ALSO
 

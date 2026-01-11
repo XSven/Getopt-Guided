@@ -184,7 +184,8 @@ sub processopts ( \@@ ) {
         # processopts() will terminate early. The return value will be
         # a special TRUE value. Using $name is not sufficient because 0 and 1
         # a posible values for $name.
-        return ( OD . $name ) if $dest->( $value, $name, $indicator ) eq EOOD
+        return ( OD . $name )
+          if ( $dest->( $value, $name, $indicator ) // '' ) eq EOOD
       } else {
         croakf "'%s' is an unsupported destination reference type for the '%s' indicator", $dest_ref_type, $indicator
       }

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT fail is is_deeply like ok plan subtest use_ok ) ], tests => 11;
+use Test::More import => [ qw( BAIL_OUT fail is is_deeply like ok plan subtest use_ok ) ], tests => 12;
 use Test::Fatal  qw( exception );
 use Test::Output qw( stdout_like  );
 use Test::Warn   qw( warning_like );
@@ -12,7 +12,7 @@ my $module;
 
 BEGIN {
   $module = 'Getopt::Guided';
-  use_ok $module, qw( print_version_info processopts ) or BAIL_OUT "Cannot loade module '$module'!"
+  use_ok $module, qw( EOOD print_version_info processopts ) or BAIL_OUT "Cannot loade module '$module'!"
 }
 
 my $fail_cb = sub { fail "'$_[ 1 ]' callback shouldn't be called" };
@@ -140,13 +140,29 @@ subtest 'Unknown option' => sub {
 };
 
 subtest 'Semantic priority' => sub {
-  plan tests => 3;
+  plan tests => 4;
 
   local $main::VERSION = 'v6.6.6';
   # -h comes first on purpose
   my @argv = qw( -h -V );
   # Best pratice: -V should have higher precedence (semantic priority) than -h
-  stdout_like { is processopts( @argv, 'V' => \&print_version_info, 'h' => $fail_cb ), '-V', 'Succeeded' }
-    qr/\A ${ \( basename( __FILE__ ) ) } \  v6\.6\.6 \n perl \  v\d+\.\d+\.\d+ \n \z/x, 'Check version info';
+  stdout_like {
+    ok my $rv = processopts( @argv, 'V' => \&print_version_info, 'h' => $fail_cb ), 'Succeeded';
+    is $rv, '-V', 'Check return value'
+  }
+  qr/\A ${ \( basename( __FILE__ ) ) } \  v6\.6\.6 \n perl \  v\d+\.\d+\.\d+ \n \z/x, 'Check version info';
   is @argv, 0, '@argv is empty'
+};
+
+subtest 'Edge case options 0 and 1' => sub {
+  plan tests => 6;
+
+  for ( ( 0, 1 ) ) {
+    my @argv = ( "-$_" );
+    # The early return triggered by EOOD leads to a "-" prefixed return value
+    # that is a boolean true value that can be distinguished from TRUE (1)
+    ok my $rv = processopts( @argv, $_ => sub { EOOD }, 'h' => $fail_cb ), 'Succeeded';
+    is $rv,   "-$_", 'Check return value';
+    is @argv, 0,     '@argv is empty'
+  }
 }
