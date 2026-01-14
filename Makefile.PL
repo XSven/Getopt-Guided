@@ -6,6 +6,7 @@ use File::Spec::Functions qw( catfile );
 
 my @main_module_namespace = qw( Getopt Guided );
 my $release_status        = 'testing';             # Transitions: unstable => testing => stable
+my $pre_release_number    = 1;
 
 my $distname            = join '-',  @main_module_namespace;
 my $main_module         = join '::', @main_module_namespace;
@@ -26,7 +27,8 @@ my %att = (
   LICENSE          => 'perl_5',
   MIN_PERL_VERSION => '5.010000',
   DISTNAME         => $distname,
-  DISTVNAME        => join( '-', $distname, $main_module_version, ( $release_status ne 'stable' ? 'TRIAL1' : () ) )
+  DISTVNAME        =>
+    join( '-', $distname, $main_module_version, ( $release_status ne 'stable' ? "TRIAL$pre_release_number" : () ) )
   ,    # Related to the below release_status metadata field
   EXE_FILES  => [ glob( join( ' ', map { catfile( $_, '*' ) } qw( bin script ) ) ) ],
   META_MERGE => {
