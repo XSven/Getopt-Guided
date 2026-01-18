@@ -22,6 +22,11 @@ sub FALSE () { !!0 }
 
 @Getopt::Guided::EXPORT_OK = qw( EOOD getopts print_version_info processopts );
 
+sub basename ( $ ) {
+  require File::Basename;
+  File::Basename::basename( $_[ 0 ] )
+}
+
 sub croakf ( $@ ) {
   @_ = ( ( @_ == 1 ? shift : sprintf shift, @_ ) . ', stopped' );
   require Carp;
@@ -139,8 +144,7 @@ sub getopts ( $\%;\@ ) {
     %$opts = ();
     # Prepare and print warning message:
     # Program name, type of error, and invalid option character
-    require File::Basename;
-    warn sprintf( "%s: %s -- %s\n", File::Basename::basename( $0 ), @error ) ## no critic ( RequireCarping )
+    warn sprintf( "%s: %s -- %s\n", basename( $0 ), @error ) ## no critic ( RequireCarping )
   }
 
   @error == 0
@@ -150,8 +154,7 @@ sub print_version_info {
   # Prepare and print version info message:
   # - Program name and version (first line)
   # - Interpreter name ("perl") and version (second line)
-  require File::Basename;
-  printf STDOUT "%s %s\nperl v%vd\n", File::Basename::basename( $0 ), $main::VERSION, $^V;
+  printf STDOUT "%s %s\nperl v%vd\n", basename( $0 ), $main::VERSION, $^V;
   EOOD
 }
 
