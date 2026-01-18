@@ -114,9 +114,9 @@ subtest 'Scalar reference destination: list option and incrementable flag' => su
   plan tests => 4;
 
   my @argv = qw( -v -I lib -vv -I local/lib/perl5 );
-  ok processopts( @argv, 'v+' => \my $verbosity, 'I,' => \my $libs ), 'Succeeded';
+  ok processopts( @argv, 'v+' => \my $verbosity, 'I,' => \my $inc ), 'Succeeded';
   is $verbosity, 3, 'Check incrementable flag value';
-  is_deeply $libs, [ qw( lib local/lib/perl5 ) ], 'Check list option value';
+  is_deeply $inc, [ qw( lib local/lib/perl5 ) ], 'Check list option value';
   is @argv, 0, '@argv is empty'
 };
 
@@ -124,9 +124,9 @@ subtest 'Array and scalar reference destination: list option and incrementable f
   plan tests => 4;
 
   my @argv = qw( -v -I lib -vv -I local/lib/perl5 );
-  ok processopts( @argv, 'v+' => \my $verbosity, 'I,' => \my @libs ), 'Succeeded';
+  ok processopts( @argv, 'v+' => \my $verbosity, 'I,' => \my @inc ), 'Succeeded';
   is $verbosity, 3, 'Check incrementable flag value';
-  is_deeply \@libs, [ qw( lib local/lib/perl5 ) ], 'Check list option value';
+  is_deeply \@inc, [ qw( lib local/lib/perl5 ) ], 'Check list option value';
   is @argv, 0, '@argv is empty'
 };
 

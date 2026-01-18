@@ -15,7 +15,20 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
 
   # Parse result
   # %opts == ( a => 'av2', c => !!1, d => [ 'dv1', 'dv2', '--' ], v => 3 )
-  # @ARGV == ( 'v1', 'v2' )
+  # @argv == ( 'v1', 'v2' )
+
+  # ---
+
+  use Getopt::Guided qw( print_version_info processopts );
+
+  my @argv = qw( -v -I lib -vv -I local/lib/perl5 );
+
+  processopts( @argv, 'V' => \&print_version_info, 'v+' => \my $verbosity, 'I,' => \my @inc );
+
+  # Processing result
+  # $verbosity == 3
+  # @inc       == ( 'lib', 'local/lib/perl5' )
+  # @argv      == ()
 
 =head1 DESCRIPTION
 

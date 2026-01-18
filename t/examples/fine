@@ -3,7 +3,6 @@ use warnings;
 
 $main::VERSION = 'v6.6.6';
 
-use File::Basename qw( basename );
 use Getopt::Guided qw( print_version_info processopts );
 
 sub run ( \@ ) {
