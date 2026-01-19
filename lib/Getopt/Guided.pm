@@ -24,7 +24,7 @@ sub FALSE () { !!0 }
 
 sub basename ( $ ) {
   require File::Basename;
-  File::Basename::basename( $_[ 0 ] )
+  goto &File::Basename::basename
 }
 
 sub croakf ( $@ ) {
