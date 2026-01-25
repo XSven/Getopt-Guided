@@ -7,7 +7,7 @@ use File::Spec::Functions qw( catfile );
 my $git_host_profile_url = 'https://github.com/XSven';
 
 my @main_module_namespace = qw( Getopt Guided );
-my $release_status        = 'testing';             # Transitions: unstable => testing => stable
+my $release_status        = 'stable';              # Transitions: unstable => testing => stable
 my $pre_release_number    = 1;
 
 my $distname            = join '-',  @main_module_namespace;

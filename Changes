@@ -1,6 +1,6 @@
 Release history for Getopt-Guided
 
-3.0.2    Sun Jan 18 08:51:55 AM CET 2026
+3.0.2    Sun Jan 25 09:22:55 AM CET 2026
          - Describe processopts()
          - Exit with code 255, if "broken" utility dies
          - Lower Perl min version requirement
